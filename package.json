@@ -1,0 +1,32 @@
+{
+  "name": "polar-defense",
+  "version": "1.0.0",
+  "description": "A 2d fixed shooter on a miniature planet.",
+  "main": "src/scripts/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:AshKyd/polar-defense.git"
+  },
+  "author": "Ash Kyd <ash@kyd.com.au>",
+  "license": "BSD",
+  "bugs": {
+    "url": "https://github.com/AshKyd/polar-defense/issues"
+  },
+  "devDependencies": {
+    "gulp": "~3.6.2",
+    "gulp-uglify": "~0.2.1",
+    "gulp-connect": "~2.0.5",
+    "gulp-browserify": "~0.5.0",
+    "gulp-less": "~1.2.3",
+    "rsyncwrapper": "~0.4.1",
+    "gulp-zip": "~1.0.0",
+    "through": "~2.3.4",
+    "browserify": "~11.0.1",
+    "uglifyjs": "~2.4.10",
+    "minifyify": "~7.0.5"
+  },
+  "dependencies": {
+    "gulp-minify-css": "~0.3.7",
+    "stats.js": "~1.0.0"
+  }
+}

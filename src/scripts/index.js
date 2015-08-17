@@ -6,7 +6,7 @@ canvas.height = window.innerHeight;
 
 var thisGame = new Game({
     tileSize: 128,
-    w: 6,
-    h: 6,
+    w: 16,
+    h: 16,
     canvas: canvas
 });

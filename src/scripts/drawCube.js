@@ -30,6 +30,9 @@ function drawPoly(ctx, a, b, c, d, e, f, g, h, fill, stroke){
 
 // Draw a cube to the specified specs
 module.exports = function(ctx, x, y, wx, wy, h, color, alpha) {
+    if(!color){
+        debugger;
+    }
     ctx.globalAlpha = alpha || 1;
     drawPoly(
         ctx,

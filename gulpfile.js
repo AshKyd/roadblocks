@@ -16,9 +16,13 @@ function browserifyTask(src, dest){
         .pipe(fs.createWriteStream(dest));
 }
 
-gulp.task('js', function() {
+gulp.task('js-main', function() {
     return browserifyTask('./src/scripts/index.js', 'dist/index.js');
 });
+gulp.task('js-worker', function() {
+    return browserifyTask('./src/scripts/worker.js', 'dist/worker.js');
+});
+gulp.task('js', ['js-main','js-worker']);
 
 gulp.task('html', function(){
     gulp.src('src/index.html')

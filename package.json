@@ -1,7 +1,7 @@
 {
-  "name": "polar-defense",
+  "name": "thirteenk-2k15",
   "version": "1.0.0",
-  "description": "A 2d fixed shooter on a miniature planet.",
+  "description": "I don't know yet",
   "main": "src/scripts/index.js",
   "repository": {
     "type": "git",
@@ -23,10 +23,21 @@
     "through": "~2.3.4",
     "browserify": "~11.0.1",
     "uglifyjs": "~2.4.10",
-    "minifyify": "~7.0.5"
+    "minifyify": "~7.0.5",
+    "http-server": "~0.8.0"
   },
   "dependencies": {
     "gulp-minify-css": "~0.3.7",
     "stats.js": "~1.0.0"
+  },
+  "scripts": {
+    "clean": "rm dist/* -rf;mkdir -p dist;",
+    "browserify": "browserify src/scripts/index.js | uglifyjs --screw-ie8 -mc > dist/index.js",
+    "copy": "cp src/index.html src/style/style.css dist/",
+    "zip": "zip dist.zip dist/* && ls -lah dist.zip",
+    "build": "npm run browserify & npm run copy; wait; npm run zip",
+    "deploy": "npm run clean; npm run build;rsync -avz dist/* direct.ash.ms:/var/www/ash.ms/public_html/js13k2k15/",
+    "server": "mkdir -p dist; cd dist; beefy ../src/scripts/index.js:index.js",
+    "watch": "npm run server & node node_modules/watch/cli.js 'npm run build' src"
   }
 }

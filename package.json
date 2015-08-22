@@ -34,7 +34,7 @@
     "clean": "rm dist/* -rf;mkdir -p dist;",
     "browserify": "browserify src/scripts/index.js | uglifyjs --screw-ie8 -mc > dist/index.js",
     "copy": "cp src/index.html src/style/style.css dist/ -r",
-    "zip": "rm dist.zip;zip -r dist.zip dist/* && ls -lah dist.zip",
+    "zip": "rm dist.zip;zip -r dist.zip dist/* && ls -l dist.zip",
     "build": "npm run browserify & npm run copy; wait; npm run zip",
     "deploy": "npm run clean; npm run build;rsync -avz dist/* direct.ash.ms:/var/www/ash.ms/public_html/js13k2k15/",
     "server": "mkdir -p dist; cd dist; beefy ../src/scripts/index.js:index.js",

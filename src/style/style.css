@@ -82,7 +82,7 @@ body{
     color:white;
 }
 .close:after{
-    content:"⨯";
+    content:"×";
 }
 
 @-webkit-keyframes rubberBand {

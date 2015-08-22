@@ -2,10 +2,11 @@ var Stats = require('./stats');
 var drawCube = require('./drawCube');
 var SpriteLib = require('./sprites.js');
 var sprites = SpriteLib.sprites;
-var placeable = SpriteLib.placeable;
+var tileLogic = SpriteLib.tileLogic;
 var firstruns = {};
 var playSound = require('./sfx');
 var jsonStringify = JSON.stringify;
+var random = require('./random');
 
 var round = Math.round;
 
@@ -23,11 +24,6 @@ function crawlMap(map, w, h, fn){
         }
     }
     return map;
-}
-
-function random(seed) {
-    var x = Math.sin(seed) * 10000;
-    return x - Math.floor(x);
 }
 
 function getIsometricPos(x, y, tileWidth){
@@ -60,6 +56,9 @@ function Game(opts){
     var tileHalf = tileSize / 2;
     var tileDepth = tileSize / 10;
 
+    // Display offset. Compensates for big fat fingers when touching.
+    var displayOffset;
+
     // Cache of rendered sprites
     var spriteCache = {};
 
@@ -79,9 +78,9 @@ function Game(opts){
     // Create a predetermined buffer of tiles.
     var tileStack = [];
     var heliStack = [];
-    var possibleTiles = Object.keys(placeable);
+    var possibleTiles = SpriteLib.placeable;
 
-    // Load up the tile queue.
+    // Load up the tile queue & pre-cache all our tiles.
     if(opts.dist){
         tileStack = opts.dist.map(function(tile){
             cacheSprite(possibleTiles[tile]);
@@ -94,6 +93,11 @@ function Game(opts){
             cacheSprite(thisTile);
         }
     }
+
+    // Cache some stuff we know we're going to use.
+    ['ok','notok'].map(function(thisTile){
+        cacheSprite(thisTile);
+    });
 
     // Bounds for latest selectable tile.
     var tileQueueBounds = getTileQueuePos(0);
@@ -118,11 +122,25 @@ function Game(opts){
     var moves;
     var longPress;
     var selectedTile;
-    var lastHoveredTile;
+    var lastHoveredTileCoords;
+    var lastHoveredTileType;
+    var lastHoveredTilePos;
+    var tileSelectType;
+    var isTouching;
+
     function touchstart(e){
         touchStartTime = Date.now();
         e.preventDefault();
         var touch = e.touches;
+        isTouching=1;
+        lastTouch = touch;
+
+        if(touch){
+            displayOffset = tileHalf;
+        } else {
+            displayOffset = 0;
+            touch = [e];
+        }
 
         // Check if we're dragging the last tile off the queue.
         if(
@@ -132,14 +150,23 @@ function Game(opts){
         ){
             selectedTile = tileStack[0];
             playSound('select');
+            tileSelectType = 0;
         }
 
-        // FIXME: I suspect this doesn't work on iOS.
-        lastTouch = touch;
+        if(getTileFromTouch(touch) === 'helipad'){
+            selectedTile = heliStack[heliStack.length-1];
+            playSound('select');
+            tileSelectType = 1;
+        }
+
         moves = 0;
+        lastHoveredTileCoords = getPixelPosFromTouch(touch);
+        lastHoveredTileType = getTileFromTouch(touch);
+        lastHoveredTilePos = getIsometricPos(lastHoveredTileCoords[0], lastHoveredTileCoords[1], tileSize);
 
         longPress = setTimeout(function(){
             if(!selectedTile && moves < 2 && opts.bulldozers-- > 0){
+                displayOffset = 0;
                 var tile = getPixelPosFromTouch(touch);
                 if(!opts.predef.filter(function(item){
                     if(tile[0] === item[0] && tile[1] === item[1]){
@@ -155,35 +182,55 @@ function Game(opts){
     }
 
     function touchmove(e){
+        if(!isTouching){
+            return;
+        }
         e.preventDefault();
         moves++;
-        if(e.touches.length === 1){
+        var touch = e.touches;
+        if(!touch){
+            touch = [e];
+        }
+        // if(e.touches.length === 1){
             // Pan the map
             // viewport[0] += (e.touches[0].clientX - lastTouch[0].clientX);
             // viewport[1] += (e.touches[0].clientY - lastTouch[0].clientY);
-        }
-        lastTouch = e.touches;
-        lastHoveredTile = false;
+        // }
+        lastTouch = touch;
+        lastHoveredTileCoords = getPixelPosFromTouch(touch);
+        lastHoveredTileType = getTileFromTouch(touch);
+        lastHoveredTilePos = getIsometricPos(lastHoveredTileCoords[0], lastHoveredTileCoords[1], tileSize);
     }
 
     function touchend(e){
+        isTouching=0;
         clearTimeout(longPress);
         if(selectedTile){
-            var target = getTileFromTouch(lastTouch);
-            if(target === 'helipad'){
+            if(lastHoveredTileType === 'helipad'){
                 heliStack.push(selectedTile);
-                tileStack.unshift();
-            } else if(placeable[selectedTile].p(target)) {
+                tileStack.shift();
+                playSound('place');
+            } else if(tileLogic[selectedTile].p(lastHoveredTileType)) {
+                if(sprites[selectedTile+'-base']){
+                    selectedTile = selectedTile+'-base';
+                    console.log('replaced with base tile');
+                }
                 try{
                     setTileFromTouch(lastTouch, selectedTile);
                     playSound('place');
-                    tileStack.shift();
+                    // 0 = tileStack, 1 = heliStack.
+                    if(tileSelectType === 0){
+                        tileStack.shift();
+                    } else {
+                        heliStack.pop();
+                    }
+                    tileSelectType = 0;
                 } catch(err){}
             }
 
             // Calculate win state and optionally show help dialog.
             calculateWinState();
-            nextTile = placeable[tileStack[0]];
+            nextTile = tileLogic[tileStack[0]];
             if(nextTile && nextTile.firstrun && !firstruns[tileStack[0]]){
                 showTooltip(nextTile.firstrun, nextTile.title, tileStack[[0]]);
                 firstruns[tileStack[0]] = true;
@@ -196,6 +243,9 @@ function Game(opts){
         ['touchstart', touchstart],
         ['touchmove', touchmove],
         ['touchend', touchend],
+        ['mousedown', touchstart],
+        ['mousemove', touchmove],
+        ['mouseup', touchend],
     ];
     events.forEach(function(event){
         canvas.addEventListener(event[0], event[1], true);
@@ -203,7 +253,7 @@ function Game(opts){
 
 
     function getPixelPosFromTouch(touch){
-        var pp = getPixelPos(lastTouch[0].clientX - viewport[0], lastTouch[0].clientY - viewport[1], tileSize);
+        var pp = getPixelPos(touch[0].clientX - viewport[0], touch[0].clientY - viewport[1] - displayOffset, tileSize);
         return [Math.ceil(pp[0]), Math.ceil(pp[1])];
     }
     function getTileFromTouch(touch){
@@ -276,7 +326,7 @@ function Game(opts){
 
         // Get our current tile details to compare against.
         var thisTile = map[here[0]][here[1]];
-        var thisTileSpec = placeable[thisTile];
+        var thisTileSpec = tileLogic[thisTile];
         var oppositeThisMovement = lastMove[0] > 1 ? 0 - 2 + lastMove[0] : lastMove[0] + 2;
         var nextMovement;
 
@@ -309,7 +359,7 @@ function Game(opts){
         ];
         try{
             nextTile = map[nextCoords[0]][nextCoords[1]];
-            nextTileSpec = placeable[nextTile];
+            nextTileSpec = tileLogic[nextTile];
         } catch(ex) {
             return {lose:path};
         }
@@ -372,9 +422,9 @@ function Game(opts){
      * Draw a single item at currentDrawPos
      * @param  {Array} layer Array layer containing params to draw
      */
-    function drawItem(layer){
+    function drawItem(layer, pos){
         if(typeof layer === 'function'){
-            layer = layer(opts.seed++);
+            layer = layer();
         }
         var layerPos = getIsometricPos(layer[1], layer[2], tileSize);
         drawCube(
@@ -399,7 +449,7 @@ function Game(opts){
             currentCtx.translate(0 - layerPos[0] - layer[1], 0 - layerPos[1]);
             var layers = sprites[layer[0]];
             if(typeof layers === 'function'){
-                layers = layers(opts.seed++);
+                layers = layers(layerPos);
             }
             layers.forEach(drawItem);
             currentCtx.translate(layerPos[0] - layer[1], layerPos[1]);
@@ -455,7 +505,7 @@ function Game(opts){
         // Cache/recache sprites before drawing
         if(!spriteCanvas){
             spriteCanvas = cacheSprite(tile);
-        } else if(spriteRound++ % 3 === (x + y) % 3){
+        } else if(spriteRound++ % 2 === 0 && SpriteLib.animated[tile]){
             cacheSprite(tile, spriteCanvas);
         }
 
@@ -481,12 +531,8 @@ function Game(opts){
             if(typeof tile === 'undefined'){
                 continue;
             }
-            if(selectedTile && i === 0){
-                ctx.drawImage(
-                    spriteCache[tile].c, // cached canvas tile
-                    lastTouch[0].clientX - tileSize/2, // x
-                    lastTouch[0].clientY - tileSize*1.25
-                );
+            // Don't render the last one if we're moving it.
+            if(isTouching && selectedTile && tileSelectType === 0 && i === 0){
             } else {
                 ctx.drawImage(
                     spriteCache[tile].c, // cacned canvas tile
@@ -501,11 +547,17 @@ function Game(opts){
 
     function drawHeliStack(pos){
         heliStack.forEach(function(tile, i){
-            ctx.drawImage(
-                spriteCache[tile].c,
-                pos[0] - tileSize/2,
-                pos[1] - 0.25*tileHalf*(i+1) - tileSize*1.5
-            );
+            // Don't draw the last tile if we're currently dragging it.
+            // This is too hard to do with array manipulation in touch events.
+            if(tileSelectType === 1 && i === heliStack.length-1){
+
+            } else{
+                ctx.drawImage(
+                    spriteCache[tile].c,
+                    pos[0] - tileSize/2,
+                    pos[1] - (0.25*tileHalf*(i+1) - tileSize*1.5)
+                );
+            }
         });
     }
 
@@ -522,6 +574,18 @@ function Game(opts){
         crawlMap(map, opts.w, opts.h, drawSprite);
         ctx.translate(0-viewport[0], 0-viewport[1]);
         drawTileQueue();
+        if(selectedTile && isTouching){
+            ctx.drawImage(
+                spriteCache[selectedTile].c, // cached canvas tile
+                lastTouch[0].clientX - tileSize/2, // x
+                lastTouch[0].clientY - tileSize*1.25  - displayOffset
+            );
+
+            if(lastHoveredTilePos && map[lastHoveredTileCoords[0]] && map[lastHoveredTileCoords[0]][lastHoveredTileCoords[1]]){
+                var indicatorTileName = lastHoveredTileType === 'helipad' || tileLogic[selectedTile].p(lastHoveredTileType) ? 'ok' : 'notok';
+                ctx.drawImage(spriteCache[indicatorTileName].c, lastHoveredTilePos[0] - tileSize/2 + viewport[0], lastHoveredTilePos[1] - tileSize*1.5 + viewport[1]);
+            }
+        }
         stats.end();
         // setTimeout(drawMap, 1000);
         requestAnimationFrame(drawMap);

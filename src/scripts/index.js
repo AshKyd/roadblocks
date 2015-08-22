@@ -6,6 +6,12 @@ var levels = require('./levels');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
+// alert([
+//     'Playing on',
+//     window.innerWidth,
+//     'x',
+//     window.innerHeight
+// ].join(' '));
 
 function loadGame(levelId){
     var level = levels[levelId];
@@ -40,4 +46,4 @@ function loadGame(levelId){
     });
 }
 
-loadGame(0);
+loadGame(4);

@@ -20,6 +20,8 @@
  */
 var roadColor = '#444444';
 var elkColor = '#AE907A';
+var grey1 = '#aaaaaa';
+var red1 = '#DC6969';
 
 function canPlaceIfDefaultTile(existing){
     return ['grass'].indexOf(existing) !== -1;
@@ -28,62 +30,62 @@ function canPlaceIfDefaultTile(existing){
 module.exports = {
     sprites: {
         roady: [
-            [-0.25,.9, 0, 0.1, 1, 0.25, '#aaaaaa'],
+            [-0.25,.9, 0, 0.1, 1, 0.25, grey1],
             [-0.25,.1, 0, .8, 1, 0.2, roadColor],
-            [-0.25,0, 0, 0.1, 1, 0.25, '#aaaaaa'],
+            [-0.25,0, 0, 0.1, 1, 0.25, grey1],
             ['car',0,.3,.2],
         ],
         roadx: [
-            [-0.25, 0, .9, 1, 0.1, 0.25, '#aaaaaa'],
+            [-0.25, 0, .9, 1, 0.1, 0.25, grey1],
             [-0.25, 0, .1, 1, 0.8, 0.2, roadColor],
-            [-0.25, 0, 0, 1, 0.1, 0.25, '#aaaaaa'],
+            [-0.25, 0, 0, 1, 0.1, 0.25, grey1],
         ],
         roadxy: [
-            [-0.25,0.9,0.9,0.1,.1,.25,'#aaaaaa'], // top
+            [-0.25,0.9,0.9,0.1,.1,.25,grey1], // top
             ['r1', 0, 0, 0],
-            [-0.25,0.9,0,0.1,.1,.25,'#aaaaaa'], //left
+            [-0.25,0.9,0,0.1,.1,.25,grey1], //left
             ['r2', 0, 0, 0],
             ['rc', 0, 0, 0],
             ['r3', 0, 0, 0],
-            [-0.25,0,0.9,0.1,.1,.25,'#aaaaaa'], //right
+            [-0.25,0,0.9,0.1,.1,.25,grey1], //right
             ['r4', 0, 0, 0],
-            [-0.25,0,0,0.1,.1,.25,'#aaaaaa'], // bottom
+            [-0.25,0,0,0.1,.1,.25,grey1], // bottom
         ],
         roadx2yl: [
-            [-0.25,.1,.9, .9, .1, .25, '#aaaaaa'],
+            [-0.25,.1,.9, .9, .1, .25, grey1],
             ['r1', 0, 0, 0],
-            [-0.25,0.9,0,0.1,.1,.25,'#aaaaaa'], //left
-            [-0.25,0,0.9,0.1,.1,.25,'#aaaaaa'], //right
+            [-0.25,0.9,0,0.1,.1,.25,grey1], //left
+            [-0.25,0,0.9,0.1,.1,.25,grey1], //right
             ['rc', 0, 0, 0],
             ['r3', 0, 0, 0],
-            [-0.25,0,0, .1, .9, .25, '#aaaaaa'],
+            [-0.25,0,0, .1, .9, .25, grey1],
         ],
         roadx2yr: [
-            [-0.25,0.9,0.9,0.1,.1,.25,'#aaaaaa'], // top
+            [-0.25,0.9,0.9,0.1,.1,.25,grey1], // top
             ['r2', 0, 0, 0], // top right
             ['r1', 0, 0, 0], // top left
             ['rc', 0, 0, 0], // center
-            [-.25,.1,0,.9,.1,.25,'#aaaaaa'],
-            [-.25,0,.1,.1,.9,.25,'#aaaaaa'],
-            [-0.25,0,0,0.1,.1,.25,'#aaaaaa'], // bottom
+            [-.25,.1,0,.9,.1,.25,grey1],
+            [-.25,0,.1,.1,.9,.25,grey1],
+            [-0.25,0,0,0.1,.1,.25,grey1], // bottom
         ],
         roady2xl: [
-            [-0.25,0.9,0.9,0.1,.1,.25,'#aaaaaa'], // top
-            [-0.25,0,.9,.9,.1,.25,'#aaaaaa'], // top right
-            [-0.25,.9,0,.1,.9,.25,'#aaaaaa'], // top right
+            [-0.25,0.9,0.9,0.1,.1,.25,grey1], // top
+            [-0.25,0,.9,.9,.1,.25,grey1], // top right
+            [-0.25,.9,0,.1,.9,.25,grey1], // top right
             ['rc',0,0,0], //road center
             ['r3', 0,0,0], //bottom left
             ['r4',0,0,0], //bottom right
-            [-0.25,0,0,0.1,.1,.25,'#aaaaaa'], // bottom
+            [-0.25,0,0,0.1,.1,.25,grey1], // bottom
         ],
         roady2xr: [
-            [-0.25,0.9,.1,0.1,.9,.25, '#aaaaaa'],
+            [-0.25,0.9,.1,0.1,.9,.25, grey1],
             ['r2', 0, 0, 0], // top right
             ['rc',0,0,0], //center
-            [-0.25,0.9,0,0.1,.1,.25,'#aaaaaa'], //left
-            [-0.25,0,0.9,0.1,.1,.25,'#aaaaaa'], //right
+            [-0.25,0.9,0,0.1,.1,.25,grey1], //left
+            [-0.25,0,0.9,0.1,.1,.25,grey1], //right
             ['r4',0,0,0], //bottom right
-            [-0.25,0,0,.9,.1,.25,'#aaaaaa'],
+            [-0.25,0,0,.9,.1,.25,grey1],
 
         ],
         forest: [
@@ -115,26 +117,37 @@ module.exports = {
         grassSurface: [
             [-0.25,0, 0, 1, 1, 0.25, '#66aa66'],
         ],
+        concreteSurface: [
+            [-0.25,0, 0, 1, 1, 0.25, grey1],
+        ],
         grass: [
             ['ground',0,0,0],
             ['grassSurface',0,0,0],
         ],
         test: [
-            [-1,0,0,1,1,1,'#aaaaaa'],
-            [0,0,0,0.1,.1,.1,'#FF8888'],
-            [0,0.9,0,0.1,.1,.1,'#FF8888'],
-            [0,0,0.9,0.1,.1,.1,'#FF8888'],
-            [0,0.9,0.9,0.1,.1,.1,'#FF8888'],
+            [-1,0,0,1,1,1,grey1],
+            [0,0,0,0.1,.1,.1,red1],
+            [0,0.9,0,0.1,.1,.1,red1],
+            [0,0,0.9,0.1,.1,.1,red1],
+            [0,0.9,0.9,0.1,.1,.1,red1],
         ],
         test2: [
-            [-1,0,0,1,1,1,'#aaaaaa'],
+            [-1,0,0,1,1,1,grey1],
             [0,0.3,0,0.7,1,1,'#cccccc'],
-            [1,0,0,1,1,0.1,'#FF8888'],
-            [0,0.3,.4,0,0.2,0.5,'#FF8888'],
+            [1,0,0,1,1,0.1,red1],
+            [0,0.3,.4,0,0.2,0.5,red1],
         ],
         water: [
             [-1, 0, 0, 1, 1, .05, '#ffff99'],
             [-0.25, 0, 0, 1, 1, 0, '#55bbff', .3],
+        ],
+        helipad: [
+            ['ground',0,0,0],
+            ['concreteSurface',0,0,0],
+            [0, .05, .05, .9, .9, 0.05, grey1],
+            [0.05, .2, .2, .6, .1, 0, red1],
+            [0.05, .2, .7, .6, .1, 0, red1],
+            [0.05, .45, .3, .1, .4, 0, red1]
         ],
         tree: function(){
             var sin = Math.sin(new Date()/300);
@@ -211,6 +224,8 @@ module.exports = {
     	roadxy: {
             c: [1,1,1,1],
             p: canPlaceIfDefaultTile,
+            firstrun: 'Cars will travel straight through intersections without making turns. You can double back over road you\'ve already placed.',
+            title: 'Intersection'
         },
     	roadx2yl: {
             c: [1,0,0,1],
@@ -230,10 +245,12 @@ module.exports = {
         },
     	forest: {
             p: function(){return true;}, // Forests can be placed anywhere.
-            firstrun: "Forest tiles can be placed on top of any square on the map."
+            title: 'Forests',
+            firstrun: "Forest tiles can be placed on top of any square on the map, including ones you've already placed."
         },
         test: {
             p: canPlaceIfDefaultTile,
+            title: 'Buildings',
             firstrun: "Place buildings alongside roads for extra points."
         }
     }

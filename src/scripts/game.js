@@ -3,6 +3,9 @@ var drawCube = require('./drawCube');
 var SpriteLib = require('./sprites.js');
 var sprites = SpriteLib.sprites;
 var placeable = SpriteLib.placeable;
+var firstruns = {};
+var playSound = require('./sfx');
+var jsonStringify = JSON.stringify;
 
 var round = Math.round;
 
@@ -42,8 +45,10 @@ function getPixelPos(x, y, tileWidth){
 }
 
 function Game(opts){
+    var _this = this;
     var canvas = opts.canvas;
     var ctx = canvas.getContext('2d');
+    var running = true;
 
     // Spacing amount used in the interface.
     var spacing = 15;
@@ -73,6 +78,7 @@ function Game(opts){
 
     // Create a predetermined buffer of tiles.
     var tileStack = [];
+    var heliStack = [];
     var possibleTiles = Object.keys(placeable);
 
     // Load up the tile queue.
@@ -108,12 +114,13 @@ function Game(opts){
     });
 
     // Add listeners.
-    canvas.a = canvas.addEventListener;
     var lastTouch = false;
     var moves;
+    var longPress;
     var selectedTile;
     var lastHoveredTile;
-    canvas.a('touchstart', function(e){
+    function touchstart(e){
+        touchStartTime = Date.now();
         e.preventDefault();
         var touch = e.touches;
 
@@ -124,15 +131,30 @@ function Game(opts){
             touch[0].clientX < tileQueueBounds + tileSize/2
         ){
             selectedTile = tileStack[0];
+            playSound('select');
         }
 
         // FIXME: I suspect this doesn't work on iOS.
         lastTouch = touch;
         moves = 0;
 
-    }, true);
+        longPress = setTimeout(function(){
+            if(!selectedTile && moves < 2 && opts.bulldozers-- > 0){
+                var tile = getPixelPosFromTouch(touch);
+                if(!opts.predef.filter(function(item){
+                    if(tile[0] === item[0] && tile[1] === item[1]){
+                        return true;
+                    }
+                }).length){
+                    playSound('boom');
+                    setTileFromTouch(touch, opts.base);
+                }
+            }
+        }, 500);
 
-    canvas.a('touchmove', function(e){
+    }
+
+    function touchmove(e){
         e.preventDefault();
         moves++;
         if(e.touches.length === 1){
@@ -142,20 +164,43 @@ function Game(opts){
         }
         lastTouch = e.touches;
         lastHoveredTile = false;
-    }, true);
+    }
 
-    canvas.a('touchend', function(e){
+    function touchend(e){
+        clearTimeout(longPress);
         if(selectedTile){
-            if(placeable[selectedTile].p(getTileFromTouch(lastTouch))){
+            var target = getTileFromTouch(lastTouch);
+            if(target === 'helipad'){
+                heliStack.push(selectedTile);
+                tileStack.unshift();
+            } else if(placeable[selectedTile].p(target)) {
                 try{
                     setTileFromTouch(lastTouch, selectedTile);
+                    playSound('place');
                     tileStack.shift();
-                    calculateWinState();
                 } catch(err){}
+            }
+
+            // Calculate win state and optionally show help dialog.
+            calculateWinState();
+            nextTile = placeable[tileStack[0]];
+            if(nextTile && nextTile.firstrun && !firstruns[tileStack[0]]){
+                showTooltip(nextTile.firstrun, nextTile.title, tileStack[[0]]);
+                firstruns[tileStack[0]] = true;
             }
         }
         selectedTile = false;
-    },true);
+    }
+
+    var events = [
+        ['touchstart', touchstart],
+        ['touchmove', touchmove],
+        ['touchend', touchend],
+    ];
+    events.forEach(function(event){
+        canvas.addEventListener(event[0], event[1], true);
+    });
+
 
     function getPixelPosFromTouch(touch){
         var pp = getPixelPos(lastTouch[0].clientX - viewport[0], lastTouch[0].clientY - viewport[1], tileSize);
@@ -163,12 +208,48 @@ function Game(opts){
     }
     function getTileFromTouch(touch){
         var pos = getPixelPosFromTouch(touch);
-        return map[pos[0]][pos[1]];
+        try{
+            return map[pos[0]][pos[1]];
+        } catch(ex){
+        }
     }
     function setTileFromTouch(touch, val){
         var pos = getPixelPosFromTouch(touch);
-        map[pos[0]][pos[1]] = val;
+
+        try{
+            map[pos[0]][pos[1]] = val;
+        } catch(ex){
+        }
     }
+
+    /**
+     * Show/hide the tooltip over the top of the game.
+     */
+    function showTooltip(message, title, tile){
+        var tooltip = opts.tooltip;
+        title = title ? '<h1>'+title+'</h1>' : '';
+        tile = tile ? '<img class="rubberBand" src="'+spriteCache[tile].c.toDataURL()+'">' : '';
+        tooltip.innerHTML = '<a class="close"></a> '+title+message+tile;
+        tooltip.setAttribute('class', 'visible');
+        tooltip.onclick = function(){
+            tooltip.setAttribute('class', '');
+            playSound('select');
+        };
+        setTimeout(function(){
+            playSound('dialog');
+        },10);
+    }
+    _this.showTooltip = showTooltip;
+
+    _this.destroy = function(){
+        // Stop the boats
+        running = false;
+
+        // tear down the infrastructure.
+        events.forEach(function(event){
+            canvas.removeEventListener(event[0], event[1], true);
+        });
+    };
 
     var trafficDirections = [
         [0,[-1,0]], // go south
@@ -236,9 +317,11 @@ function Game(opts){
 
         // and see if it connects back to this tile.
         var oppositeNextMovement = nextMovement[0] > 1 ? 0 - 2 + nextMovement[0] : nextMovement[0] + 2;
-        if(nextTileSpec && nextTileSpec.c[oppositeNextMovement]){
+        if(nextTileSpec && nextTileSpec.c && nextTileSpec.c[oppositeNextMovement]){
             path.push(nextCoords);
             return calculateTrafficPath(nextCoords, there, nextMovement, path);
+        } else {
+            return {lose:path};
         }
     }
 
@@ -247,19 +330,41 @@ function Game(opts){
      */
     function calculateWinState(){
         var result = calculateTrafficPath(opts.predef[0], opts.predef[1], trafficDirections[1]);
-        if(result.win){
+        if(result && result.win){
             var sinPath = function(layer, tick){
                 if(tick > this.start && tick < this.end){
                     layer[1] += 0-(Math.sin((tick-this.start)/125))*20;
                 }
             };
             result.win.forEach(function(coords, i){
+                setTimeout(function(){
+                    playSound('ping');
+                }, i*100);
                 mapOverrides[coords[0]][coords[1]] = {
                     fn: sinPath,
                     start: i*100 + Date.now(),
                     end: i*100 + Date.now() + 350,
                 };
             });
+            playSound('win', result.win.length/10+0.1);
+            playSound('win', result.win.length/10+0.2);
+            setTimeout(function(){
+                if(opts.onwin){
+                    opts.onwin.call(_this);
+                }
+            },result.win.length*100+2000);
+        } else {
+            var full = true;
+            crawlMap(map, opts.w, opts.h, function(x,y,tile){
+                if(tile === opts.base){
+                    full = false;
+                }
+            });
+            if(full){
+                if(opts.onlose){
+                    opts.onlose.call(_this);
+                }
+            }
         }
     }
 
@@ -358,6 +463,10 @@ function Game(opts){
             mapOverrides[x][y].fn.call(mapOverrides[x][y], currentDrawPos, Date.now());
         }
         ctx.drawImage(spriteCanvas.c, currentDrawPos[0] - tileSize/2, currentDrawPos[1] - tileSize*1.5);
+
+        if(tile === 'helipad'){
+            drawHeliStack(currentDrawPos);
+        }
     }
 
 
@@ -390,10 +499,23 @@ function Game(opts){
         }
     }
 
+    function drawHeliStack(pos){
+        heliStack.forEach(function(tile, i){
+            ctx.drawImage(
+                spriteCache[tile].c,
+                pos[0] - tileSize/2,
+                pos[1] - 0.25*tileHalf*(i+1) - tileSize*1.5
+            );
+        });
+    }
+
     /**
      * Draw the entire map, including all layers & sprites.
      */
     function drawMap(){
+        if(!running){
+            return;
+        }
         stats.begin();
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.translate(viewport[0], viewport[1]);
@@ -406,6 +528,12 @@ function Game(opts){
     }
 
     drawMap();
+    // if(opts.onload){
+    //     opts.onload.call(_this);
+    // }
+    if(opts.intro){
+        showTooltip.apply(this, opts.intro);
+    }
 }
 
 module.exports = Game;

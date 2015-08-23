@@ -19,6 +19,8 @@
  * x (x position)
  * y (y position)
  */
+
+var random = require('./random');
 var roadColor = '#444444';
 var elkColor = '#AE907A';
 var grey1 = '#aaaaaa';
@@ -30,10 +32,6 @@ var green1 = '#66aa66'; // Grass et al
 var greenTree = '#9EC8A0'; // trees
 var yellowSand = '#D6D38C';
 var brown1 = '#C8AF9E'; // tree trunk
-
-function canPlaceIfDefaultTile(existing){
-    return ['grass', 'sand'].indexOf(existing) !== -1;
-}
 
 var sprites =  {
     roady: [
@@ -148,10 +146,30 @@ var sprites =  {
     sand: [
         ['ground',0,0,0],
         ['sandSurface',0,0,0],
-        ['treePalm', 0, .5, .5],
     ],
-    test: [
-        [-1,0,0,1,1,1,grey1],
+    palm: [
+        ['ground',0,0,0],
+        ['sandSurface',0,0,0],
+        ['treePalm', 0, .8, .8],
+        ['treePalm', 0, .4, .4],
+    ],
+    building: [
+        ['ground',0,0,0],
+        ['grassSurface',0,0,0],
+
+        // house
+        [0,.2,.4,.8,.6,.8,brown1],
+
+        // garage
+        [0,.3,0,.7,.4,.4,brown1],
+
+        //garage door
+        [0,.3,.05,0,.3,.35,grey1],
+
+        // windows
+        [.05,.2,.75,0,.2,.28,glass], //bottom
+        [.4,.2,.75,0,.2,.28,glass], // top
+        [0,.2,.5,0,.2,.68,glass], // tall window
     ],
     test2: [
         [-1,0,0,1,1,1,grey1],
@@ -159,10 +177,12 @@ var sprites =  {
         [1,0,0,1,1,0.1,red1],
         [0,0.3,.4,0,0.2,0.5,red1],
     ],
-    water: [
-        [-1, 0, 0, 1, 1, .05, '#ffff99'],
-        [-0.25, 0, 0, 1, 1, 0, '#55bbff', .3],
-    ],
+    water: function(){
+        return [
+            [-1, 0, 0, 1, 1, .05, '#ffff99'],
+            [-0.2+Math.sin(Date.now()/1000)/20, 0, 0, 1, 1, 0, '#55bbff', .3],
+        ];
+    },
     helipad: [
         ['ground',0,0,0],
         ['concreteSurface',0,0,0],
@@ -178,6 +198,11 @@ var sprites =  {
         [0,0,0,0.05,.05,.1,red1],
         [0,0.95,0,0.05,.05,.1,green1],
         [0,0,0.95,0.05,.05,.1,green1],
+    ],
+    dump: [
+        ['ground',0,0,0],
+        [-0.25,0, 0, 1, 1, 0.25, brown1],
+        ['bulldozer',0,4,4],
     ],
     ok: [
         [0,0,0,1,1,0,'#00ff00',.5]
@@ -298,6 +323,11 @@ Object.keys(sprites).map(function(spriteName){
     }
 });
 
+
+function canPlaceIfDefaultTile(existing){
+    return ['grass', 'sand'].indexOf(existing) !== -1;
+}
+
 var tileLogic = {
 	roady: {
         c: [0,1,0,1], // Connections,,
@@ -330,11 +360,15 @@ var tileLogic = {
         p: canPlaceIfDefaultTile,
     },
 	forest: {
-        p: function(){return true;}, // Forests can be placed anywhere.
+        p: function(tile){
+            if(tile !== 'water'){
+                return true;
+            }
+        }, // Forests can be placed anywhere.
         title: 'Forests',
         firstrun: "Forest tiles can be placed on top of any square on the map, including ones you've already placed."
     },
-    test: {
+    building: {
         p: canPlaceIfDefaultTile,
         title: 'Buildings',
         firstrun: "Place buildings alongside roads for extra points."
@@ -360,6 +394,8 @@ var animated = {
     helipad: 1,
     tree: 1,
     elk: 1,
+    water:1,
+    palm: 1,
 };
 
 module.exports = {

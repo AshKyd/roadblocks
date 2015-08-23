@@ -7,7 +7,9 @@ var firstruns = {};
 var playSound = require('./sfx');
 var jsonStringify = JSON.stringify;
 var random = require('./random');
+var jsonStringify = JSON.stringify;
 
+window.fudge = [0,0];
 var round = Math.round;
 
 function crawlMap(map, w, h, fn){
@@ -26,6 +28,9 @@ function crawlMap(map, w, h, fn){
     return map;
 }
 
+/**
+ * Get the position (in pixels) from an isometric tile x,y
+ */
 function getIsometricPos(x, y, tileWidth){
     return [
         (x - y) * (tileWidth / 2),
@@ -33,6 +38,9 @@ function getIsometricPos(x, y, tileWidth){
     ];
 }
 
+/**
+ * Get the position (in isometric coordinates) from a pixel x,y
+ */
 function getPixelPos(x, y, tileWidth){
     return [
         (x / (tileWidth/2) + y / (tileWidth/4)) /2,
@@ -75,6 +83,9 @@ function Game(opts){
     // Stats object tracks performance. Remove for production.
     var stats = new Stats();
 
+    // DEBUG: show the path on the map.
+    var debugPath;
+
     // Create a predetermined buffer of tiles.
     var tileStack = [];
     var heliStack = [];
@@ -83,14 +94,14 @@ function Game(opts){
     // Load up the tile queue & pre-cache all our tiles.
     if(opts.dist){
         tileStack = opts.dist.map(function(tile){
-            cacheSprite(possibleTiles[tile]);
+            cacheSprite(possibleTiles[tile], undefined, opts.seed++);
             return possibleTiles[tile];
         });
     } else {
         for(var i=0; i<opts.w*opts.h*2; i++){
             var thisTile = possibleTiles[round(random(opts.seed++)*(possibleTiles.length-1))];
             tileStack.push(thisTile);
-            cacheSprite(thisTile);
+            cacheSprite(thisTile, undefined, opts.seed++);
         }
     }
 
@@ -136,7 +147,7 @@ function Game(opts){
         lastTouch = touch;
 
         if(touch){
-            displayOffset = tileHalf;
+            displayOffset = 40;
         } else {
             displayOffset = 0;
             touch = [e];
@@ -165,7 +176,7 @@ function Game(opts){
         lastHoveredTilePos = getIsometricPos(lastHoveredTileCoords[0], lastHoveredTileCoords[1], tileSize);
 
         longPress = setTimeout(function(){
-            if(!selectedTile && moves < 2 && opts.bulldozers-- > 0){
+            if(!selectedTile && moves < 5 && opts.bulldozers-- > 0){
                 displayOffset = 0;
                 var tile = getPixelPosFromTouch(touch);
                 if(!opts.predef.filter(function(item){
@@ -210,7 +221,7 @@ function Game(opts){
                 heliStack.push(selectedTile);
                 tileStack.shift();
                 playSound('place');
-            } else if(tileLogic[selectedTile].p(lastHoveredTileType)) {
+            } else if(canPlaceTileHere(selectedTile, lastHoveredTileCoords)) {
                 if(sprites[selectedTile+'-base']){
                     selectedTile = selectedTile+'-base';
                     console.log('replaced with base tile');
@@ -226,6 +237,9 @@ function Game(opts){
                     }
                     tileSelectType = 0;
                 } catch(err){}
+            } else {
+                playSound('error');
+                playSound('error',0.15);
             }
 
             // Calculate win state and optionally show help dialog.
@@ -251,7 +265,22 @@ function Game(opts){
         canvas.addEventListener(event[0], event[1], true);
     });
 
-
+    /**
+     * Can we place the selected tile here?
+     * @param  {String} placingThis Type of tile to place.
+     * @param  {Array} coords      Coordinates of the tile we want to place on.
+     * @return {Boolean}
+     */
+    function canPlaceTileHere(placingThis, coords){
+        for(var i=0;i<2; i++){
+            if(jsonStringify(coords) === jsonStringify(opts.predef[i].slice(0,2))){
+                return false;
+            }
+        }
+        if(map[coords[0]]){
+            return tileLogic[placingThis].p(map[coords[0]][coords[1]]);
+        }
+    }
     function getPixelPosFromTouch(touch){
         var pp = getPixelPos(touch[0].clientX - viewport[0], touch[0].clientY - viewport[1] - displayOffset, tileSize);
         return [Math.ceil(pp[0]), Math.ceil(pp[1])];
@@ -380,6 +409,7 @@ function Game(opts){
      */
     function calculateWinState(){
         var result = calculateTrafficPath(opts.predef[0], opts.predef[1], trafficDirections[1]);
+        debugPath = result.win || result.lose;
         if(result && result.win){
             var sinPath = function(layer, tick){
                 if(tick > this.start && tick < this.end){
@@ -459,8 +489,11 @@ function Game(opts){
         }
     }
 
-    function renderCanvas(tiles){
+    function renderCanvas(tiles, seed){
         currentCtx.translate(tileSize/2, tileSize*1.5);
+        if(typeof tiles === 'function'){
+            tiles = tiles(seed);
+        }
         tiles.forEach(drawLayer);
         currentCtx.translate(0-tileSize/2, 0-tileSize*1.5);
 
@@ -469,10 +502,11 @@ function Game(opts){
     /**
      * Draw a single tile
      */
-    function cacheSprite(tile, spriteCanvas){
+    function cacheSprite(tile, spriteCanvas, seed){
         if(!spriteCanvas){
             spriteCanvas = {
-                c: document.createElement('canvas')
+                c: document.createElement('canvas'),
+                seed: seed
             };
             spriteCanvas.c.width = tileSize+1;
             spriteCanvas.c.height = tileSize*2;
@@ -482,7 +516,7 @@ function Game(opts){
             currentCtx = spriteCanvas.x;
             currentCtx.clearRect(0,0,spriteCanvas.c.width, spriteCanvas.c.height);
         }
-        renderCanvas(sprites[tile]);
+        renderCanvas(sprites[tile], spriteCanvas.seed);
         spriteCache[tile] = spriteCanvas;
         return spriteCanvas;
     }
@@ -554,8 +588,8 @@ function Game(opts){
             } else{
                 ctx.drawImage(
                     spriteCache[tile].c,
-                    pos[0] - tileSize/2,
-                    pos[1] - (0.25*tileHalf*(i+1) - tileSize*1.5)
+                    pos[0] - tileSize/2 + fudge[0],
+                    pos[1] - tileSize * 1.5 - tileHalf/10*(i+1)
                 );
             }
         });
@@ -582,10 +616,17 @@ function Game(opts){
             );
 
             if(lastHoveredTilePos && map[lastHoveredTileCoords[0]] && map[lastHoveredTileCoords[0]][lastHoveredTileCoords[1]]){
-                var indicatorTileName = lastHoveredTileType === 'helipad' || tileLogic[selectedTile].p(lastHoveredTileType) ? 'ok' : 'notok';
+                var indicatorTileName = lastHoveredTileType === 'helipad' || canPlaceTileHere(selectedTile, lastHoveredTileCoords) ? 'ok' : 'notok';
                 ctx.drawImage(spriteCache[indicatorTileName].c, lastHoveredTilePos[0] - tileSize/2 + viewport[0], lastHoveredTilePos[1] - tileSize*1.5 + viewport[1]);
             }
         }
+
+        // if(debugPath){
+        //     debugPath.map(function(tile){
+        //         var pos = getIsometricPos(tile[0], tile[1], tileSize);
+        //         ctx.drawImage(spriteCache.ok.c, pos[0] - tileSize/2 + viewport[0], pos[1] - tileSize*1.5 + viewport[1]);
+        //     });
+        // }
         stats.end();
         // setTimeout(drawMap, 1000);
         requestAnimationFrame(drawMap);

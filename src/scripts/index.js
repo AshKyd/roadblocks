@@ -21,7 +21,7 @@ function loadGame(levelId){
     }
 
     var thisGame = new Game({
-        tileSize: (canvas.width - 30)/level.w,
+        tileSize: (canvas.width - 30)/(level.wMod || level.w),
         w: level.w,
         h: level.h,
         canvas: canvas,
@@ -46,4 +46,4 @@ function loadGame(levelId){
     });
 }
 
-loadGame(4);
+loadGame(7);

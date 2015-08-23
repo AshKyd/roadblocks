@@ -46,4 +46,4 @@ function loadGame(levelId){
     });
 }
 
-loadGame(7);
+loadGame(0);

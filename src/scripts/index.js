@@ -6,13 +6,6 @@ var levels = require('./levels');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-// alert([
-//     'Playing on',
-//     window.innerWidth,
-//     'x',
-//     window.innerHeight
-// ].join(' '));
-
 function loadGame(levelId){
     var level = levels[levelId];
     if(!level){
@@ -21,7 +14,7 @@ function loadGame(levelId){
     }
 
     var thisGame = new Game({
-        tileSize: (canvas.width - 30)/(level.wMod || level.w),
+        tileSize: ((canvas.width + canvas.height)/2 - 30)/(level.wMod || level.w),
         w: level.w,
         h: level.h,
         canvas: canvas,
@@ -37,6 +30,7 @@ function loadGame(levelId){
             console.log('onwin');
             this.destroy();
             loadGame(levelId+1);
+            window.location.hash = levelId+1;
         },
         onlose: function(){
             console.log('onlose');
@@ -46,4 +40,8 @@ function loadGame(levelId){
     });
 }
 
-loadGame(0);
+if(window.location.hash){
+    loadGame(Number(window.location.hash.substr(1)));
+} else {
+    loadGame(0);
+}

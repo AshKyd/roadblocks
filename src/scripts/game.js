@@ -9,7 +9,6 @@ var jsonStringify = JSON.stringify;
 var random = require('./random');
 var jsonStringify = JSON.stringify;
 
-window.fudge = [0,0];
 var round = Math.round;
 
 function crawlMap(map, w, h, fn){
@@ -91,6 +90,12 @@ function Game(opts){
     var heliStack = [];
     var possibleTiles = SpriteLib.placeable;
 
+    // equivalent of date.now
+    var now = Date.now();
+
+    // Keep track of fps
+    var time = 0;
+
     // Load up the tile queue & pre-cache all our tiles.
     if(opts.dist){
         tileStack = opts.dist.map(function(tile){
@@ -138,13 +143,13 @@ function Game(opts){
     var lastHoveredTilePos;
     var tileSelectType;
     var isTouching;
+    var touchStartSpot;
 
     function touchstart(e){
-        touchStartTime = Date.now();
+        touchStartTime = now;
         e.preventDefault();
         var touch = e.touches;
         isTouching=1;
-        lastTouch = touch;
 
         if(touch){
             displayOffset = 40;
@@ -152,12 +157,14 @@ function Game(opts){
             displayOffset = 0;
             touch = [e];
         }
+        lastTouch = touch;
+        touchStartSpot = touch[0].clientX + touch[0].clientY;
 
         // Check if we're dragging the last tile off the queue.
         if(
-            touch[0].clientY < tileSize/2 &&
+            touch[0].clientY < tileSize &&
             touch[0].clientX > tileQueueBounds &&
-            touch[0].clientX < tileQueueBounds + tileSize/2
+            touch[0].clientX < tileQueueBounds + tileSize
         ){
             selectedTile = tileStack[0];
             playSound('select');
@@ -175,20 +182,27 @@ function Game(opts){
         lastHoveredTileType = getTileFromTouch(touch);
         lastHoveredTilePos = getIsometricPos(lastHoveredTileCoords[0], lastHoveredTileCoords[1], tileSize);
 
-        longPress = setTimeout(function(){
-            if(!selectedTile && moves < 5 && opts.bulldozers-- > 0){
-                displayOffset = 0;
-                var tile = getPixelPosFromTouch(touch);
-                if(!opts.predef.filter(function(item){
-                    if(tile[0] === item[0] && tile[1] === item[1]){
-                        return true;
+        if(!selectedTile){
+            longPress = setTimeout(function(){
+                var touchCurrentSpot = touch[0].clientX + touch[0].clientY;
+                if(moves < 10 && opts.bulldozers-- > 0 && touchCurrentSpot-15 < touchStartSpot && touchCurrentSpot+15 > touchStartSpot){
+                    displayOffset = 0;
+                    var tile = getPixelPosFromTouch(touch);
+                    if(!opts.predef.filter(function(item){
+                        if(tile[0] === item[0] && tile[1] === item[1]){
+                            return true;
+                        }
+                    }).length){
+                        playSound('boom');
+                        setTileFromTouch(touch, opts.base);
+                        document.body.className = 'rumble';
+                        setTimeout(function(){
+                            document.body.className = '';
+                        }, 500);
                     }
-                }).length){
-                    playSound('boom');
-                    setTileFromTouch(touch, opts.base);
                 }
-            }
-        }, 500);
+            }, 400);
+        }
 
     }
 
@@ -202,11 +216,11 @@ function Game(opts){
         if(!touch){
             touch = [e];
         }
-        // if(e.touches.length === 1){
+        if(!selectedTile && touch.length === 1){
             // Pan the map
-            // viewport[0] += (e.touches[0].clientX - lastTouch[0].clientX);
-            // viewport[1] += (e.touches[0].clientY - lastTouch[0].clientY);
-        // }
+            viewport[0] += (touch[0].clientX - lastTouch[0].clientX);
+            viewport[1] += (touch[0].clientY - lastTouch[0].clientY);
+        }
         lastTouch = touch;
         lastHoveredTileCoords = getPixelPosFromTouch(touch);
         lastHoveredTileType = getTileFromTouch(touch);
@@ -309,10 +323,14 @@ function Game(opts){
         title = title ? '<h1>'+title+'</h1>' : '';
         tile = tile ? '<img class="rubberBand" src="'+spriteCache[tile].c.toDataURL()+'">' : '';
         tooltip.innerHTML = '<a class="close"></a> '+title+message+tile;
+        tooltip.style.display = 'block';
         tooltip.setAttribute('class', 'visible');
         tooltip.onclick = function(){
             tooltip.setAttribute('class', '');
             playSound('select');
+            setTimeout(function(){
+                tooltip.style.display = 'none';
+            },1200);
         };
         setTimeout(function(){
             playSound('dialog');
@@ -422,8 +440,8 @@ function Game(opts){
                 }, i*100);
                 mapOverrides[coords[0]][coords[1]] = {
                     fn: sinPath,
-                    start: i*100 + Date.now(),
-                    end: i*100 + Date.now() + 350,
+                    start: i*100 + now,
+                    end: i*100 + now + 350,
                 };
             });
             playSound('win', result.win.length/10+0.1);
@@ -435,11 +453,16 @@ function Game(opts){
             },result.win.length*100+2000);
         } else {
             var full = true;
-            crawlMap(map, opts.w, opts.h, function(x,y,tile){
-                if(tile === opts.base){
-                    full = false;
-                }
-            });
+
+            // If tileStack is empty, we lose.
+            // Otherwise check if the map is full; if it is, we lose.
+            if(tileStack.length !== 0){
+                crawlMap(map, opts.w, opts.h, function(x,y,tile){
+                    if(tile === opts.base){
+                        full = false;
+                    }
+                });
+            }
             if(full){
                 if(opts.onlose){
                     opts.onlose.call(_this);
@@ -513,9 +536,13 @@ function Game(opts){
             currentCtx = spriteCanvas.c.getContext('2d');
             spriteCanvas.x = currentCtx;
         } else {
+            if(spriteCanvas.lastRender === now){
+                return spriteCanvas;
+            }
             currentCtx = spriteCanvas.x;
             currentCtx.clearRect(0,0,spriteCanvas.c.width, spriteCanvas.c.height);
         }
+        spriteCanvas.lastRender = now;
         renderCanvas(sprites[tile], spriteCanvas.seed);
         spriteCache[tile] = spriteCanvas;
         return spriteCanvas;
@@ -539,28 +566,50 @@ function Game(opts){
         // Cache/recache sprites before drawing
         if(!spriteCanvas){
             spriteCanvas = cacheSprite(tile);
-        } else if(spriteRound++ % 2 === 0 && SpriteLib.animated[tile]){
+        } else if(spriteRound % 2 === 0 && SpriteLib.animated[tile]){
             cacheSprite(tile, spriteCanvas);
         }
 
         if(mapOverrides[x][y]){
-            mapOverrides[x][y].fn.call(mapOverrides[x][y], currentDrawPos, Date.now());
+            mapOverrides[x][y].fn.call(mapOverrides[x][y], currentDrawPos, now);
         }
-        ctx.drawImage(spriteCanvas.c, currentDrawPos[0] - tileSize/2, currentDrawPos[1] - tileSize*1.5);
+
+        // Treat water tiles differently so we can get the sweet sine wave ripple.
+        // Only do this if we're over 20 fps as it's kinda slow.
+        if(tile === 'water' && 1000/time > 20){
+            ctx.drawImage(spriteCanvas.c, currentDrawPos[0] - tileSize/2, currentDrawPos[1] - tileSize*1.5 - Math.sin(x+y+now/200)*2 );
+        } else {
+            ctx.drawImage(spriteCanvas.c, currentDrawPos[0] - tileSize/2, currentDrawPos[1] - tileSize*1.5);
+        }
 
         if(tile === 'helipad'){
             drawHeliStack(currentDrawPos);
         }
     }
 
-
-
     function getTileQueuePos(i){
         return 0 - tileHalf/2 + (opts.queue - i - 1)*(tileHalf+spacing);
     }
 
+    var tileQueueCanvas = document.createElement('canvas');
+    tileQueueCanvas.width = getTileQueuePos(0) + tileSize;
+    tileQueueCanvas.height = tileSize;
+    var tileQueueContext = tileQueueCanvas.getContext('2d');
+
     function drawTileQueue(){
-        for(var i=0; i<opts.queue; i++){
+
+        for(var i=1; i>-1; i--){
+            tileQueueContext.fillStyle = i === 0 ? '#55bbff' : '#fff';
+            tileQueueContext.fillRect(
+                0+i,
+                1 - i,
+                round(getTileQueuePos(0) + tileSize /2 + 10),
+                round(tileHalf + i*2)
+            );
+        }
+
+
+        for(i=0; i<opts.queue; i++){
             var tile = tileStack[i];
             if(typeof tile === 'undefined'){
                 continue;
@@ -568,7 +617,7 @@ function Game(opts){
             // Don't render the last one if we're moving it.
             if(isTouching && selectedTile && tileSelectType === 0 && i === 0){
             } else {
-                ctx.drawImage(
+                tileQueueContext.drawImage(
                     spriteCache[tile].c, // cacned canvas tile
                     getTileQueuePos(i), // x
                     0-tileHalf*0.75, //y
@@ -577,6 +626,10 @@ function Game(opts){
                 );
             }
         }
+        tileQueueContext.globalAlpha = 0.5;
+        tileQueueContext.fillRect(0,1,getTileQueuePos(0), tileHalf-1);
+        tileQueueContext.globalAlpha = 1;
+        ctx.drawImage(tileQueueCanvas,0,10);
     }
 
     function drawHeliStack(pos){
@@ -588,7 +641,7 @@ function Game(opts){
             } else{
                 ctx.drawImage(
                     spriteCache[tile].c,
-                    pos[0] - tileSize/2 + fudge[0],
+                    pos[0] - tileSize/2,
                     pos[1] - tileSize * 1.5 - tileHalf/10*(i+1)
                 );
             }
@@ -602,7 +655,10 @@ function Game(opts){
         if(!running){
             return;
         }
+        time = (time * 0.9 + (Date.now() - now) * 0.1);
+        now = Date.now();
         stats.begin();
+        spriteRound++;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.translate(viewport[0], viewport[1]);
         crawlMap(map, opts.w, opts.h, drawSprite);
@@ -628,7 +684,7 @@ function Game(opts){
         //     });
         // }
         stats.end();
-        // setTimeout(drawMap, 1000);
+        // setTimeout(drawMap, 1);
         requestAnimationFrame(drawMap);
     }
 
@@ -639,6 +695,10 @@ function Game(opts){
     if(opts.intro){
         showTooltip.apply(this, opts.intro);
     }
+
+    setInterval(function(){
+        console.log('fps',1000/time);
+    },1000);
 }
 
 module.exports = Game;

@@ -20,6 +20,8 @@
  * y (y position)
  */
 
+var exaggeration = window.innerWidth < 800 ? 2 : 1;
+
 var random = require('./random');
 var roadColor = '#444444';
 var elkColor = '#AE907A';
@@ -177,12 +179,10 @@ var sprites =  {
         [1,0,0,1,1,0.1,red1],
         [0,0.3,.4,0,0.2,0.5,red1],
     ],
-    water: function(){
-        return [
-            [-1, 0, 0, 1, 1, .05, '#ffff99'],
-            [-0.2+Math.sin(Date.now()/1000)/20, 0, 0, 1, 1, 0, '#55bbff', .3],
-        ];
-    },
+    water: [
+            [-1, 0, 0, 1, 1, .1, '#ffff99'],
+            [-0.25, 0, 0, 1, 1, 0, '#55bbff', .3],
+    ],
     helipad: [
         ['ground',0,0,0],
         ['concreteSurface',0,0,0],
@@ -235,7 +235,7 @@ var sprites =  {
         var a = [];
         var pos,height;
         for(var i=0; i<6; i++){
-            a.push([height=5*i/50, pos=0-sin*i, 0, .03, .03, .1, brown1]);
+            a.push([height=5*i/50, pos=0-sin*i*exaggeration, 0, .03, .03, .1, brown1]);
         }
 
         // treetop
@@ -394,7 +394,6 @@ var animated = {
     helipad: 1,
     tree: 1,
     elk: 1,
-    water:1,
     palm: 1,
 };
 

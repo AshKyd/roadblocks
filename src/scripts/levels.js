@@ -6,9 +6,10 @@ function addBeach(a, x){
 }
 
 var roadBase = 'roady-base';
+var forest = 'forest';
 
 module.exports = [
-    { // intro level.
+    { // intro level. 0
         seed: 100,
         w: 4,
         h: 4,
@@ -18,11 +19,11 @@ module.exports = [
         predef: [
             [2,3,roadBase],
             [2,0,roadBase],
-            [1,3,'forest'],
+            [1,3,forest],
         ],
         intro: ['Connect the roads by dragging tiles from the top.', 'New game', roadBase],
     },
-    { // introduction to intersections
+    { // introduction to intersections 1
         seed: 100,
         w: 4,
         h: 4,
@@ -32,13 +33,13 @@ module.exports = [
         predef: [
             [3,3,roadBase],
             [1,0,roadBase],
-            [2,3,'forest'],
-            [2,2,'forest'],
+            [2,3,forest],
+            [2,2,forest],
         ],
         intro: ['Now you\'ve got the hang of it, give it a go with all the tiles.', 'Your turn', 'roadx'],
     },
-    { // intro to helipads
-        seed: 6,
+    { // intro to helipads 2
+        seed: 8,
         w: 4,
         h: 4,
         base: 'grass',
@@ -50,18 +51,23 @@ module.exports = [
         ],
         intro: ['The helipad can stack tiles for later.', 'Helipad', 'helipad']
     },
-    { // first open level
-        seed: 7,
+    { // first open level 3
+        seed: 12,
         w: 6,
         h: 6,
+        wMod:4,
         base: 'grass',
         bulldozers: 99,
         predef: [
             [3,5,roadBase],
             [1,0,roadBase],
+            [0,0,'helipad'],
+            [1,2,'forest'],
+            [2,3,'forest'],
+            [3,3,'forest'],
         ],
     },
-    {
+    { // 4
         seed: 200,
         w: 6,
         h:6,
@@ -76,33 +82,38 @@ module.exports = [
             ];
             addBeach(a, 4);
             a.push(end); // double up, addBeach overwrote this
+            a.push([4,5,'palm']);
+            a.push([4,4,'palm']);
             return a;
         })(),
     },
-    {
+    { // 5
         seed: 100,
         w:6,
         h:6,
+        wMod:4,
         base: 'grass',
         bulldozers: 99,
         predef: (function(){
             var a = [
                 [1,5,roadBase],
                 [1,0,roadBase],
+                [0,5,forest],
             ];
             addBeach(a, 4);
             for(var i=0;i<6;i++){
                 a.push([i,3,'water']);
             }
             a.push([3,3,'broady']);
+            a.push([4,0,'palm']);
             return a;
         })(),
     },
-    {
+    { // 6
         seed: 301,
         w:7,
         h:7,
-        wMod: 5,
+        wMod: 4,
         base: 'sand',
         bulldozers: 99,
         predef: (function(){
@@ -121,11 +132,11 @@ module.exports = [
             return a;
         })(),
     },
-    {
+    { // 7
         seed: 400,
         w:7,
         h:7,
-        wMod: 5,
+        wMod: 4,
         base:'grass',
         bulldozers: 99,
         predef: (function(){

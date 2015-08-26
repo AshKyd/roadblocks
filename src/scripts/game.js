@@ -169,16 +169,18 @@ function Game(opts){
             tileSelectType = 0;
         }
 
-        if(getTileFromTouch(touch) === 'helipad'){
-            selectedTile = heliStack[heliStack.length-1];
-            playSound('select');
-            tileSelectType = 1;
-        }
-
         moves = 0;
         lastHoveredTileCoords = getPixelPosFromTouch(touch);
         lastHoveredTileType = getTileFromTouch(touch);
         lastHoveredTilePos = getIsometricPos(lastHoveredTileCoords[0], lastHoveredTileCoords[1], tileSize);
+
+        // Do this before we do our fat finger munging.
+        if(getTileFromTouch(touch, 0) === 'helipad'){
+            console.log('helipad');
+            selectedTile = heliStack[heliStack.length-1];
+            playSound('select');
+            tileSelectType = 1;
+        }
 
         if(!selectedTile){
             longPress = setTimeout(function(){
@@ -309,12 +311,12 @@ function Game(opts){
             return tileLogic[placingThis].p(map[coords[0]][coords[1]]);
         }
     }
-    function getPixelPosFromTouch(touch){
-        var pp = getPixelPos(touch.clientX - viewport[0], touch.clientY - viewport[1] - displayOffset, tileSize);
+    function getPixelPosFromTouch(touch, includeOffset){
+        var pp = getPixelPos(touch.clientX - viewport[0], touch.clientY - viewport[1] - (includeOffset!==0 ? displayOffset : 0), tileSize);
         return [Math.ceil(pp[0]), Math.ceil(pp[1])];
     }
-    function getTileFromTouch(touch){
-        var pos = getPixelPosFromTouch(touch);
+    function getTileFromTouch(touch, includeOffset){
+        var pos = getPixelPosFromTouch(touch, includeOffset);
         try{
             return map[pos[0]][pos[1]];
         } catch(ex){

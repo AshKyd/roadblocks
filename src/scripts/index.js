@@ -24,6 +24,7 @@ function loadGame(levelId){
         seed: level.seed,
         dist: level.dist,
         intro: level.intro,
+        strict: level.strict,
         queue:5,
         bulldozers: level.bulldozers,
         onwin: function(){
@@ -38,6 +39,13 @@ function loadGame(levelId){
             loadGame(levelId);
         }
     });
+
+
+    document.body.onclick = function(e){
+        if(e.target.dataset.action){
+            thisGame[e.target.dataset.action]();
+        }
+    };
 }
 
 if(window.location.hash){

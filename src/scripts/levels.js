@@ -13,6 +13,7 @@ module.exports = [
         seed: 100,
         w: 4,
         h: 4,
+        strict: 1,
         base: 'grass',
         dist: [0,0,0,0,0],
         bulldozers: 99,
@@ -27,6 +28,7 @@ module.exports = [
         seed: 100,
         w: 4,
         h: 4,
+        strict: 1,
         base: 'grass',
         dist: [0,3,1,2,5,6,4],
         bulldozers: 99,
@@ -43,13 +45,15 @@ module.exports = [
         w: 4,
         h: 4,
         base: 'grass',
+        strict: true,
         bulldozers: 99,
+        dist: [0,4,1,5,0,0,0,0],
         predef: [
             [1,3,roadBase],
             [3,0,roadBase],
             [0,0,'helipad'],
         ],
-        intro: ['The helipad can stack tiles for later.', 'Helipad', 'helipad']
+        intro: ['The helipad can stack tiles for later. Use this to reverse the order of your tiles.', 'Helipad', 'helipad']
     },
     { // first open level 3
         seed: 12,
@@ -58,6 +62,11 @@ module.exports = [
         wMod:4,
         base: 'grass',
         bulldozers: 99,
+        strict: true,
+        dist: [3, 6, 1, 1, 4, 5, 0,0,
+            1,3,5,0,6 // Filler to prevent the level ending
+        ],
+        // dist: [2,3,4,5,6],
         predef: [
             [3,5,roadBase],
             [1,0,roadBase],

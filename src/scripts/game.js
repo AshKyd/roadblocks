@@ -70,12 +70,10 @@ function Game(opts){
     // Cache of rendered sprites
     var spriteCache = {};
 
-    // Incrementing integer to choose whether to render this sprite.
-    var spriteRound = 0;
-
     // Current viewport. Default to center the map
     var mapHeight = opts.h*tileHalf/4;
     var viewport = [canvas.width/2, (canvas.height/2-mapHeight)];
+    var renderChrome = 1;
 
     //Current drawing position. Global so we can recycle & share between fns.
     var currentCtx;
@@ -283,6 +281,25 @@ function Game(opts){
      * @return {Boolean}
      */
     function canPlaceTileHere(placingThis, coords){
+        // Strict mode only lets you place tiles to continue the current road.
+        if(opts.strict && placingThis.indexOf('road') === 0){
+            // This will throw when attempting to access out of bounds tiles.
+            try{
+                var oldTile = map[coords[0]][coords[1]];
+                var oldRoute = getCalculatedTrafficPath();
+                map[coords[0]][coords[1]] = placingThis;
+                var newRoute = getCalculatedTrafficPath();
+                map[coords[0]][coords[1]] = oldTile;
+                if(newRoute.win){
+                    return true;
+                }
+                if(oldRoute.lose.length === newRoute.lose.length){
+                    return false;
+                }
+            }catch(e){
+                return false;
+            }
+        }
         for(var i=0;i<2; i++){
             if(jsonStringify(coords) === jsonStringify(opts.predef[i].slice(0,2))){
                 return false;
@@ -345,6 +362,25 @@ function Game(opts){
         });
     };
 
+    /**
+     * Take screenshot
+     */
+    this.ss = function(){
+        renderChrome = 0;
+        drawMap();
+        var a = document.createElement('a');
+        a.setAttribute('download', 'screenshot.png');
+        a.href = canvas.toDataURL('image/png');
+        a.click();
+        renderChrome = 1;
+        drawMap();
+    };
+
+    function calculatePoints(here){
+
+    }
+
+    // A handy dandy array that maps tiles to one another. See also sprites.js
     var trafficDirections = [
         [0,[-1,0]], // go south
         [1,[0,-1]], // go north
@@ -419,11 +455,16 @@ function Game(opts){
         }
     }
 
+    // Convenience method
+    function getCalculatedTrafficPath(){
+        return calculateTrafficPath(opts.predef[0], opts.predef[1], trafficDirections[1]);
+    }
+
     /**
      * Calculate the win state.
      */
     function calculateWinState(){
-        var result = calculateTrafficPath(opts.predef[0], opts.predef[1], trafficDirections[1]);
+        var result = getCalculatedTrafficPath();
         debugPath = result.win || result.lose;
         if(result && result.win){
             var sinPath = function(layer, tick){
@@ -563,7 +604,7 @@ function Game(opts){
         // Cache/recache sprites before drawing
         if(!spriteCanvas){
             spriteCanvas = cacheSprite(tile);
-        } else if(spriteRound % 2 === 0 && SpriteLib.animated[tile]){
+        } else if(SpriteLib.animated[tile]){
             cacheSprite(tile, spriteCanvas);
         }
 
@@ -594,7 +635,9 @@ function Game(opts){
     var tileQueueContext = tileQueueCanvas.getContext('2d');
 
     function drawTileQueue(){
-
+        if(!renderChrome){
+            return;
+        }
         for(var i=1; i>-1; i--){
             tileQueueContext.fillStyle = i === 0 ? '#55bbff' : '#fff';
             tileQueueContext.fillRect(
@@ -649,15 +692,15 @@ function Game(opts){
     /**
      * Draw the entire map, including all layers & sprites.
      */
-    function drawMap(){
+    function drawMap(keepRendering){
         if(!running){
             return;
         }
         time = (time * 0.9 + (Date.now() - now) * 0.1);
         now = Date.now();
         stats.begin();
-        spriteRound++;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#191F27';
+        ctx.fillRect(0,0,canvas.width,canvas.height);
         ctx.translate(viewport[0], viewport[1]);
         crawlMap(map, opts.w, opts.h, drawSprite);
         ctx.translate(0-viewport[0], 0-viewport[1]);
@@ -683,7 +726,9 @@ function Game(opts){
         // }
         stats.end();
         // setTimeout(drawMap, 1);
-        requestAnimationFrame(drawMap);
+        if(keepRendering !== false){
+            requestAnimationFrame(drawMap);
+        }
     }
 
     drawMap();

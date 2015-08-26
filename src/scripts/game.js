@@ -7,6 +7,7 @@ var firstruns = {};
 var playSound = require('./sfx');
 var jsonStringify = JSON.stringify;
 var random = require('./random');
+var touchList = require('./touchlist');
 var jsonStringify = JSON.stringify;
 
 var round = Math.round;
@@ -148,23 +149,22 @@ function Game(opts){
     function touchstart(e){
         touchStartTime = now;
         e.preventDefault();
-        var touch = e.touches;
+        var touch = touchList(e);
         isTouching=1;
 
-        if(touch){
+        if(touch.is){ // If this is a touch event
             displayOffset = 40;
         } else {
             displayOffset = 0;
-            touch = [e];
         }
         lastTouch = touch;
-        touchStartSpot = touch[0].clientX + touch[0].clientY;
+        touchStartSpot = touch.clientX + touch.clientY;
 
         // Check if we're dragging the last tile off the queue.
         if(
-            touch[0].clientY < tileSize &&
-            touch[0].clientX > tileQueueBounds &&
-            touch[0].clientX < tileQueueBounds + tileSize
+            touch.clientY < tileSize &&
+            touch.clientX > tileQueueBounds &&
+            touch.clientX < tileQueueBounds + tileSize
         ){
             selectedTile = tileStack[0];
             playSound('select');
@@ -184,7 +184,7 @@ function Game(opts){
 
         if(!selectedTile){
             longPress = setTimeout(function(){
-                var touchCurrentSpot = touch[0].clientX + touch[0].clientY;
+                var touchCurrentSpot = touch.clientX + touch.clientY;
                 if(moves < 10 && opts.bulldozers-- > 0 && touchCurrentSpot-15 < touchStartSpot && touchCurrentSpot+15 > touchStartSpot){
                     displayOffset = 0;
                     var tile = getPixelPosFromTouch(touch);
@@ -212,14 +212,11 @@ function Game(opts){
         }
         e.preventDefault();
         moves++;
-        var touch = e.touches;
-        if(!touch){
-            touch = [e];
-        }
-        if(!selectedTile && touch.length === 1){
+        var touch = touchList(e);
+        if(!selectedTile){
             // Pan the map
-            viewport[0] += (touch[0].clientX - lastTouch[0].clientX);
-            viewport[1] += (touch[0].clientY - lastTouch[0].clientY);
+            viewport[0] += (touch.clientX - lastTouch.clientX);
+            viewport[1] += (touch.clientY - lastTouch.clientY);
         }
         lastTouch = touch;
         lastHoveredTileCoords = getPixelPosFromTouch(touch);
@@ -296,7 +293,7 @@ function Game(opts){
         }
     }
     function getPixelPosFromTouch(touch){
-        var pp = getPixelPos(touch[0].clientX - viewport[0], touch[0].clientY - viewport[1] - displayOffset, tileSize);
+        var pp = getPixelPos(touch.clientX - viewport[0], touch.clientY - viewport[1] - displayOffset, tileSize);
         return [Math.ceil(pp[0]), Math.ceil(pp[1])];
     }
     function getTileFromTouch(touch){
@@ -593,7 +590,7 @@ function Game(opts){
 
     var tileQueueCanvas = document.createElement('canvas');
     tileQueueCanvas.width = getTileQueuePos(0) + tileSize;
-    tileQueueCanvas.height = tileSize;
+    tileQueueCanvas.height = tileHalf+2;
     var tileQueueContext = tileQueueCanvas.getContext('2d');
 
     function drawTileQueue(){
@@ -627,7 +624,8 @@ function Game(opts){
             }
         }
         tileQueueContext.globalAlpha = 0.5;
-        tileQueueContext.fillRect(0,1,getTileQueuePos(0), tileHalf-1);
+        tileQueueContext.fillStyle = '#fff';
+        tileQueueContext.fillRect(0,1,getTileQueuePos(0)-tileHalf/2, tileHalf-1);
         tileQueueContext.globalAlpha = 1;
         ctx.drawImage(tileQueueCanvas,0,10);
     }
@@ -667,8 +665,8 @@ function Game(opts){
         if(selectedTile && isTouching){
             ctx.drawImage(
                 spriteCache[selectedTile].c, // cached canvas tile
-                lastTouch[0].clientX - tileSize/2, // x
-                lastTouch[0].clientY - tileSize*1.25  - displayOffset
+                lastTouch.clientX - tileSize/2, // x
+                lastTouch.clientY - tileSize*1.25  - displayOffset
             );
 
             if(lastHoveredTilePos && map[lastHoveredTileCoords[0]] && map[lastHoveredTileCoords[0]][lastHoveredTileCoords[1]]){

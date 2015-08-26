@@ -27,48 +27,6 @@ html{
     transform: scale(1);
 }
 
-#tt::after {
-    content: '';
-    width: 100%;
-    height:10px;
-    position:absolute;
-    bottom:-10px;
-    left:0;
-    background-color: #4AADFF;
-    -webkit-transform:skew(35deg);
-    -webkit-transform-origin:top;
-
-    -moz-transform:skew(35deg);
-    -moz-transform-origin:top;
-
-    -o-transform:skew(35deg);
-    -o-transform-origin:top;
-
-    transform:skew(35deg);
-    transform-origin:top;
-}
-#tt::before {
-    content: '';
-    width: 10px;
-    height: 100%;
-    position: absolute;
-    top: 6px;
-    right: -10px;
-    background-color:  #234E72;
-    -webkit-transform: skewY(55deg);
-    -webkit-transform-origin: top;
-
-    -moz-transform: skewY(55deg);
-    -moz-transform-origin: top;
-
-    -o-transform: skewY(55deg);
-    -o-transform-origin: top;
-
-    transform: skewY(55deg);
-    transform-origin: top;
-    border-radius:3px;
-}
-
 .close{
     position:absolute;
     top:10px;

@@ -176,7 +176,6 @@ function Game(opts){
 
         // Do this before we do our fat finger munging.
         if(getTileFromTouch(touch, 0) === 'helipad'){
-            console.log('helipad');
             selectedTile = heliStack[heliStack.length-1];
             playSound('select');
             tileSelectType = 1;
@@ -227,7 +226,12 @@ function Game(opts){
         if(selectedTile){
             if(lastHoveredTileType === 'helipad'){
                 heliStack.push(selectedTile);
-                tileStack.shift();
+
+                // If we pulled this tile off the helipad then put it back on,
+                // don't shift off the main stack.
+                if(tileSelectType != 1){
+                    tileStack.shift();
+                }
                 playSound('place');
             } else if(canPlaceTileHere(selectedTile, lastHoveredTileCoords)) {
                 if(sprites[selectedTile+'-base']){
@@ -249,7 +253,6 @@ function Game(opts){
                 playSound('error');
                 playSound('error',0.15);
             }
-
             // Calculate win state and optionally show help dialog.
             calculateWinState();
             nextTile = tileLogic[tileStack[0]];
@@ -259,6 +262,7 @@ function Game(opts){
             }
         }
         selectedTile = false;
+        tileSelectType = 0;
     }
 
     var events = [

@@ -22,7 +22,7 @@ module.exports = [
             [2,0,roadBase],
             [1,3,forest],
         ],
-        intro: ['Connect the roads by dragging tiles from the top.', 'New game', roadBase],
+        intro: ['Connect from left to right by dragging tiles from the top.', 'New game', roadBase],
     },
     { // introduction to intersections 1
         seed: 100,
@@ -150,8 +150,8 @@ module.exports = [
         bulldozers: 99,
         predef: (function(){
             var a = [
-                [6,2,'roadx'],
-                [0,4,'roadx'],
+                [6,2,'roadx-base'],
+                [0,4,'roadx-base'],
                 [6,1,'sand'],
                 [6,0,'water'],
                 [5,1,'sand'],

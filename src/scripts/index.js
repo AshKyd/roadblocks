@@ -13,6 +13,16 @@ function loadGame(levelId){
         return;
     }
 
+    var actions = {
+        restart: function(){
+            console.log('restarting');
+            thisGame.destroy(function(){
+                loadGame(levelId);
+            });
+
+        }
+    };
+
     var thisGame = new Game({
         tileSize: ((canvas.width + canvas.height)/2 - 30)/(level.wMod || level.w),
         w: level.w,
@@ -29,21 +39,26 @@ function loadGame(levelId){
         bulldozers: level.bulldozers,
         onwin: function(){
             console.log('onwin');
-            this.destroy();
+            thisGame.destroy();
             loadGame(levelId+1);
             window.location.hash = levelId+1;
         },
         onlose: function(){
-            console.log('onlose');
-            this.destroy('Look like you got stuck. Tap to try again.', 'Level failed');
-            loadGame(levelId);
+            thisGame.destroy(function(){
+                thisGame.showTooltip.apply(thisGame, ['Look like you got stuck. Tap to try again.', 'Level failed']);
+                loadGame(levelId);
+            });
         }
     });
 
 
     document.body.onclick = function(e){
-        if(e.target.dataset.action){
-            thisGame[e.target.dataset.action]();
+        var action = e.target.dataset.action;
+        if(actions[action]){
+            actions[action]();
+        }
+        if(thisGame[action]){
+            thisGame[action]();
         }
     };
 }

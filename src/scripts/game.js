@@ -195,10 +195,7 @@ function Game(opts){
                     }).length){
                         playSound('boom');
                         setTileFromTouch(touch, opts.base);
-                        document.body.className = 'rumble';
-                        setTimeout(function(){
-                            document.body.className = '';
-                        }, 500);
+                        rumble();
                     }
                 }
             }, 400);
@@ -331,6 +328,13 @@ function Game(opts){
         }
     }
 
+    function rumble(){
+        document.body.className = 'rumble';
+        setTimeout(function(){
+            document.body.className = '';
+        }, 500);
+    }
+
     /**
      * Show/hide the tooltip over the top of the game.
      */
@@ -354,14 +358,44 @@ function Game(opts){
     }
     _this.showTooltip = showTooltip;
 
-    _this.destroy = function(){
-        // Stop the boats
-        running = false;
+    /**
+     * Fall away animation for use in mapOverrides/this.destroy
+     */
+    function fallAway(currentDrawPos){
+        var offset = Math.pow(1.02, Math.max(0, (now - this.start)/3)) / 200 * canvas.height;
+        currentDrawPos[1] += offset;
+    }
 
-        // tear down the infrastructure.
-        events.forEach(function(event){
-            canvas.removeEventListener(event[0], event[1], true);
-        });
+    _this.destroy = function(cb){
+
+        // If we have a callback, perform the animation.
+        if(cb){
+            mapOverrides = crawlMap([], opts.w, opts.h, function(){
+                var start = now + Math.random()*100;
+                return {
+                    fn: fallAway,
+                    start: start,
+                    end: start + 500,
+                };
+            });
+            setTimeout(teardown,1000);
+            setTimeout(rumble,50);
+        } else {
+            // otherwise just tear down immediately.
+            teardown();
+        }
+        function teardown(){
+            // Stop the boats
+            running = false;
+
+            // tear down the infrastructure.
+            events.forEach(function(event){
+                canvas.removeEventListener(event[0], event[1], true);
+            });
+            if(cb){
+                cb();
+            }
+        }
     };
 
     /**

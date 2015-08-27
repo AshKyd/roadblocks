@@ -10,6 +10,8 @@ var random = require('./random');
 var touchList = require('./touchlist');
 var jsonStringify = JSON.stringify;
 
+var colorInterface = '#55bbff';
+
 var round = Math.round;
 
 function crawlMap(map, w, h, fn){
@@ -94,6 +96,9 @@ function Game(opts){
 
     // Keep track of fps
     var time = 0;
+
+    // Game score!
+    var points = 0;
 
     // Load up the tile queue & pre-cache all our tiles.
     if(opts.dist){
@@ -236,11 +241,11 @@ function Game(opts){
             } else if(canPlaceTileHere(selectedTile, lastHoveredTileCoords)) {
                 if(sprites[selectedTile+'-base']){
                     selectedTile = selectedTile+'-base';
-                    console.log('replaced with base tile');
                 }
                 try{
                     setTileFromTouch(lastTouch, selectedTile);
                     playSound('place');
+                    calculatePoints(getPixelPosFromTouch(lastTouch,1));
                     // 0 = tileStack, 1 = heliStack.
                     if(tileSelectType === 0){
                         tileStack.shift();
@@ -384,6 +389,7 @@ function Game(opts){
             });
             setTimeout(teardown,1000);
             setTimeout(rumble,50);
+            playSound('boom');
         } else {
             // otherwise just tear down immediately.
             teardown();
@@ -416,10 +422,6 @@ function Game(opts){
         drawMap();
     };
 
-    function calculatePoints(here){
-
-    }
-
     // A handy dandy array that maps tiles to one another. See also sprites.js
     var trafficDirections = [
         [0,[-1,0]], // go south
@@ -427,6 +429,53 @@ function Game(opts){
         [2,[1,0]], // go east
         [3,[0,1]], // go south
     ];
+
+    function calculatePoints(here){
+        trafficDirections.forEach(function(dir){
+            var pos = [
+                here[0]+dir[1][0],
+                here[1]+dir[1][1]
+            ];
+            try{
+                var thisTile = map[pos[0]][pos[1]];
+                if(tileLogic[thisTile]){
+                    points += showPoints(pos, tileLogic[thisTile].points || 0);
+                }
+            }catch(e){}
+        });
+    }
+
+    var visiblePoints = [];
+    function showPoints(here, howMany, color){
+        if(howMany){
+            var pos = getIsometricPos(here[0], here[1], tileSize);
+            visiblePoints.push([now, howMany, pos]);
+        }
+        return howMany;
+    }
+    function drawPoints(){
+        ctx.font = "bold 16px serif";
+        ctx.strokeStyle = '#fff';
+        ctx.fillStyle = colorInterface;
+        ctx.lineWidth = 5;
+        if(visiblePoints.length){
+            visiblePoints = visiblePoints.filter(function(spec,i){
+                var diff = now - spec[0];
+                if(diff < 500){
+                    var args = [
+                        spec[1],
+                        spec[2][0] + viewport[0] + Math.sin(now/500+130*i)*5,
+                        spec[2][1] + viewport[1] - diff/1000*tileHalf - tileHalf
+                    ];
+                    ctx.strokeText.apply(ctx,args);
+                    ctx.fillText.apply(ctx,args);
+                } else if(diff > 500){
+                    return false;
+                }
+                return true;
+            });
+        }
+    }
 
     function calculateTrafficPath(here, there, lastMove, path){
         // Init our route.
@@ -507,9 +556,13 @@ function Game(opts){
         var result = getCalculatedTrafficPath();
         debugPath = result.win || result.lose;
         if(result && result.win){
-            var sinPath = function(layer, tick){
-                if(tick > this.start && tick < this.end){
-                    layer[1] += 0-(Math.sin((tick-this.start)/125))*20;
+            var sinPath = function(layer, coords){
+                if(now > this.start && now < this.end){
+                    layer[1] += 0-(Math.sin((now-this.start)/125))*20;
+                    if(!this.s){
+                        this.s = 1;
+                        // calculatePoints(coords);
+                    }
                 }
             };
             result.win.forEach(function(coords, i){
@@ -649,7 +702,7 @@ function Game(opts){
         }
 
         if(mapOverrides[x][y]){
-            mapOverrides[x][y].fn.call(mapOverrides[x][y], currentDrawPos, now);
+            mapOverrides[x][y].fn.call(mapOverrides[x][y], currentDrawPos, [x,y]);
         }
 
         // Treat water tiles differently so we can get the sweet sine wave ripple.
@@ -679,7 +732,7 @@ function Game(opts){
             return;
         }
         for(var i=1; i>-1; i--){
-            tileQueueContext.fillStyle = i === 0 ? '#55bbff' : '#fff';
+            tileQueueContext.fillStyle = i === 0 ? colorInterface : '#fff';
             tileQueueContext.fillRect(
                 0+i,
                 1 - i,
@@ -757,6 +810,7 @@ function Game(opts){
                 ctx.drawImage(spriteCache[indicatorTileName].c, lastHoveredTilePos[0] - tileSize/2 + viewport[0], lastHoveredTilePos[1] - tileSize*1.5 + viewport[1]);
             }
         }
+        drawPoints();
 
         // if(debugPath){
         //     debugPath.map(function(tile){

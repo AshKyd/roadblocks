@@ -38,7 +38,6 @@ function loadGame(levelId){
         queue:5,
         bulldozers: level.bulldozers,
         onwin: function(){
-            console.log('onwin');
             thisGame.destroy();
             loadGame(levelId+1);
             window.location.hash = levelId+1;

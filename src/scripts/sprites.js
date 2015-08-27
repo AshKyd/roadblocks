@@ -366,25 +366,31 @@ var tileLogic = {
             }
         }, // Forests can be placed anywhere.
         title: 'Forests',
-        firstrun: "Forest tiles can be placed on top of any square on the map, including ones you've already placed."
+        firstrun: "Forest tiles can be placed on top of any square on the map, including ones you've already placed.",
+        points: 50
     },
     building: {
         p: canPlaceIfDefaultTile,
         title: 'Buildings',
-        firstrun: "Place buildings alongside roads for extra points."
+        firstrun: "Place buildings alongside roads for extra points.",
+        points: 100
     }
 };
 
 // Get a list of placeables
 var placeable = Object.keys(tileLogic);
 
-// Copy over the logiv for bridges & road tiles with bases.
+// Copy over the logic for bridges & road tiles with bases.
 placeable.map(function(spriteName){
     if(spriteName.indexOf('road') === 0){
         tileLogic[spriteName+'-base'] = tileLogic[spriteName];
         tileLogic['b'+spriteName] = tileLogic[spriteName];
     }
 });
+
+tileLogic.helipad = {
+    points: 500
+};
 
 // These tiles are animated, no others.
 // Note: doesn't seem to affect render speed that much.

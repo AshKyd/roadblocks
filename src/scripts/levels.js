@@ -1,12 +1,13 @@
 function addBeach(a, x){
     for(var i=0;i<6;i++){
-        a.push([x+1,i,'water']);
+        a.push([x+1,i,water]);
         a.push([x,i,'sand']);
     }
 }
 
 var roadBase = 'roady-base';
 var forest = 'forest';
+var water = 'water';
 
 module.exports = [
     { // intro level. 0
@@ -20,7 +21,7 @@ module.exports = [
         predef: [
             [2,3,roadBase],
             [2,0,roadBase],
-            [1,3,forest],
+            [1,2,forest],
         ],
         intro: ['Connect from left to right by dragging tiles from the top.', 'New game', roadBase],
     },
@@ -71,9 +72,9 @@ module.exports = [
             [3,5,roadBase],
             [1,0,roadBase],
             [0,0,'helipad'],
-            [1,2,'forest'],
-            [2,3,'forest'],
-            [3,3,'forest'],
+            [1,2,forest],
+            [2,3,forest],
+            [3,3,forest],
         ],
     },
     { // 4
@@ -111,7 +112,7 @@ module.exports = [
             ];
             addBeach(a, 4);
             for(var i=0;i<6;i++){
-                a.push([i,3,'water']);
+                a.push([i,3,water]);
             }
             a.push([3,3,'broady']);
             a.push([4,0,'palm']);
@@ -132,11 +133,11 @@ module.exports = [
                 [4,1,'palm'],
                 [0,3,'building'],
                 [5,2,'helipad'],
-                [5,1,'water'],
+                [5,1,water],
             ];
             for(var i=0; i<7; i++){
-                a.push([i,0,'water']);
-                a.push([6,i,'water']);
+                a.push([i,0,water]);
+                a.push([6,i,water]);
             }
             return a;
         })(),
@@ -153,10 +154,10 @@ module.exports = [
                 [6,2,'roadx-base'],
                 [0,4,'roadx-base'],
                 [6,1,'sand'],
-                [6,0,'water'],
+                [6,0,water],
                 [5,1,'sand'],
-                [5,0,'water'],
-                [4,0,'water'],
+                [5,0,water],
+                [4,0,water],
                 [4,1,'sand'],
                 [3,0,'sand'],
                 [3,1,'sand'],

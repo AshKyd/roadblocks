@@ -64,7 +64,7 @@ module.exports = function(canvas, ctx, cb, force){
             }
         }
 
-        if(now - start <= 800){
+        if(now - start <= 1000){
             requestAnimationFrame(render);
         } else {
             if(cb){

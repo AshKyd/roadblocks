@@ -1,7 +1,11 @@
-function addBeach(a, x){
-    for(var i=0;i<6;i++){
-        a.push([x+1,i,water]);
-        a.push([x,i,'sand']);
+function addRow(a, x, max, type){
+    for(var i=0;i<max;i++){
+        a.push([x,i,type]);
+    }
+}
+function addCol(a, y, max, type){
+    for(var i=0;i<max;i++){
+        a.push([i,y,type]);
     }
 }
 
@@ -74,6 +78,60 @@ module.exports = {
                 [3,3,forest],
             ],
         },
+        {
+            seed:13,
+            w:6,
+            h: 6,
+            wMod: 4,
+            base: 'sand',
+            strict: 1,
+            dist: [0,1,1,5,3,4,5,6,1],
+            predef: (function(){
+                var a = [
+                    [1,5,roadBase],
+                    [3,0,roadBase],
+                    [0,0,water],
+                    [0,1,water],
+                    [1,1,water],
+                    [1,0,water],
+                ];
+                addCol(a, 3, 6, water);
+                addCol(a, 2, 3, water);
+                a.push([5,2,'palm']);
+                a.push([2,1,'helipad']);
+                a.push([4,3,'broady']);
+                return a;
+            })()
+        },
+        {
+            seed: 14,
+            w:8,
+            h:8,
+            wMod:4,
+            base: 'sand',
+            strict: 1,
+            dist:[0,1,2,0,5,3,4,6,7,1,1,5,5,4,4,1,0],
+            predef: (function(){
+                var a = [
+                    [3,7,roadBase],
+                    [5,0,roadBase],
+                ];
+                addRow(a,0,8,water);
+                addRow(a,1,8,water);
+                addRow(a,7,8,water);
+                addCol(a,4,7,water);
+                addCol(a,0,7,water);
+                a.push([5,0,'broady']);
+                a.push([6,4,'broady']);
+                a.push([3,4,'broady']);
+                a.push([2,2,'building']);
+                a.push([2,1,'forest']);
+                a.push([3,1,'building']);
+                a.push([6,6,'helipad']);
+
+                return a;
+            })()
+        }
     ],
     Casual: [
         { // 4
@@ -88,7 +146,8 @@ module.exports = {
                     end,
                     [1,1,'building'],
                 ];
-                addBeach(a, 4);
+                addRow(a, 4, 6, 'sand');
+                addRow(a, 5, 6, 'water');
                 a.push(end); // double up, addBeach overwrote this
                 a.push([4,5,'palm']);
                 a.push([4,4,'palm']);
@@ -107,10 +166,9 @@ module.exports = {
                     [1,0,roadBase],
                     [0,5,forest],
                 ];
-                addBeach(a, 4);
-                for(var i=0;i<6;i++){
-                    a.push([i,3,water]);
-                }
+                addRow(a, 4, 6, 'sand');
+                addRow(a, 5, 6, 'water');
+                addCol(a, 3, 6, 'water');
                 a.push([3,3,'broady']);
                 a.push([4,0,'palm']);
                 return a;
@@ -131,10 +189,8 @@ module.exports = {
                     [5,2,'helipad'],
                     [5,1,water],
                 ];
-                for(var i=0; i<7; i++){
-                    a.push([i,0,water]);
-                    a.push([6,i,water]);
-                }
+                addRow(a, 6, 7, 'water');
+                addCol(a, 0, 7, 'water');
                 return a;
             })(),
         },

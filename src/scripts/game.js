@@ -206,11 +206,16 @@ function Game(opts){
                     displayOffset = 0;
                     var tile = getPixelPosFromTouch(touch);
                     var tileType = getTileFromTouch(touch);
-                    if(tileType && tileType !== opts.base && !opts.predef.filter(function(item){
+                    var predefs = opts.predef.filter(function(item){
+                        if(item[2] === opts.base){
+                            console.log('skipping this tile');
+                            return false;
+                        }
                         if(tile[0] === item[0] && tile[1] === item[1]){
                             return true;
                         }
-                    }).length){
+                    });
+                    if(tileType && tileType !== opts.base && !predefs.length){
                         setTileFromTouch(touch, opts.base);
                         playSound('boom');
                         rumble();

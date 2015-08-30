@@ -35,11 +35,11 @@
     "clean": "rm dist/* -rf;mkdir -p dist;",
     "browserify": "browserify src/scripts/index.js | uglifyjs --screw-ie8 -mc > dist/index.js",
     "browserify-nouglify": "browserify src/scripts/index.js> /tmp/index.js",
-    "closure": "closure-compiler --compilation_level ADVANCED_OPTIMIZATIONS --language_in=ECMASCRIPT5 /tmp/index.js --js_output_file=dist/index2.js",
+    "closure": "closure-compiler --compilation_level ADVANCED_OPTIMIZATIONS --language_in=ECMASCRIPT5 /tmp/index.js --js_output_file=dist/index.js",
     "copy": "cp src/index.html dist/ -r",
     "css": "cat src/style/style.css|node_modules/clean-css/bin/cleancss > dist/style.css",
     "zip": "rm dist.zip;zip -r dist.zip dist/* && ls -l dist.zip",
-    "build": "npm run copy & npm run css & npm run browserify-nouglify && npm run closure; wait; npm run zip",
+    "build": "npm run copy & npm run css & npm run browserify; wait; npm run zip",
     "deploy": "npm run clean; npm run build;rsync -avz dist/* direct.ash.ms:/var/www/ash.ms/public_html/js13k2k15/",
     "server": "mkdir -p dist; cd dist; beefy ../src/scripts/index.js:index.js",
     "watch": "npm run server & node node_modules/watch/cli.js 'npm run build' src"

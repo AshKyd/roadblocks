@@ -101,7 +101,8 @@ module.exports = {
                 a.push([2,1,'helipad']);
                 a.push([4,3,'broady']);
                 return a;
-            })()
+            })(),
+            intro: ['Long press to bulldoze a tile you no longer need.', 'Bulldoze', 'dump'],
         },
         {
             seed: 14,
@@ -130,7 +131,8 @@ module.exports = {
                 a.push([6,6,'helipad']);
 
                 return a;
-            })()
+            })(),
+            intro: ['There may be multiple ways to complete a level. See how many points you can get.', 'Many ways', 'sand']
         }
     ],
     Casual: [

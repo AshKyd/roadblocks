@@ -119,7 +119,7 @@ function Game(opts){
     }
 
     // Cache some stuff we know we're going to use.
-    ['ok','notok'].map(function(thisTile){
+    ['ok','notok','dump'].map(function(thisTile){
         cacheSprite(thisTile);
     });
 

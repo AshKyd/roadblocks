@@ -4,6 +4,12 @@ html{
     padding:0;
     background: #191F27;
     overflow:hidden;
+    font-family: sans-serif;
+}
+
+*{
+    -webkit-transition:opacity .15s, left .15s, transform .15s, top .15s;
+    transition:opacity .15s, left .15s, transform .15s, top .15s;
 }
 
 #tt{
@@ -15,16 +21,52 @@ html{
     right:50px;
     padding: 20px;
     background: #fff;
-    z-index:2;
-    transform: scale(0);
-    transition: all .1s;
+    z-index:10;
     border-radius:2px;
     font-size:2em;
-    font-family: sans-serif;
+    -webkit-transform: scale(0);
+    transform: scale(0);
+}
+@media(min-width: 800px){
+    #tt{
+        padding:20px 40px;
+        left:150px;
+        right:150px;
+        top:100px;
+        bottom:100px;
+    }
 }
 
-#tt.visible{
+.ingame.tt #tt{
+    -webkit-transform: scale(1);
     transform: scale(1);
+}
+
+.ingame.tt #s{
+    opacity:1;
+}
+
+.ingame #s{
+    opacity:0;
+    z-index:9;
+    position:absolute;
+    left:0;
+    top:0;
+    bottom:0;
+    right:0;
+    background:rgba(0,0,0,.5);
+}
+
+#tt img{
+    display:block;
+    margin:-15% auto 0;
+    padding-bottom:20px;
+}
+
+@media(max-height:768px){
+    #tt img{
+        max-height: 300px;
+    }
 }
 
 .close{
@@ -45,11 +87,62 @@ html{
     content:"×";
 }
 
-.chrome{
+/* buttons */
+#b{
     position:absolute;
-    z-index: 10;
-    top:0;
-    right:0;
+    z-index: 5;
+    bottom:10px;
+    left:-10em;
+    background: #55bbff;
+    border:1px solid white;
+    border-left-style: none;
+    padding:10px;
+    font-size:40px;
+}
+.ingame #b,
+.rumble{
+    left:0;
+}
+@media(max-width:800px){
+    #b{
+        font-size:20px;
+    }
+}
+
+#b a{
+    display:inline-block;
+    width:1.5em;
+    line-height:1.5em;
+    text-align: center;
+    color:white;
+    border-radius:2px;
+    cursor:pointer;
+}
+#b a:hover{
+    background:rgba(255,255,255,.2);
+}
+
+/* points */
+#p{
+    position:absolute;
+    z-index:5;
+    top:-3em;
+    right:10px;
+    margin-left:20px;
+    font-weight:bold;
+    font-size:30px;
+    color: #55bbff;
+    text-align:right;
+    display:block;
+    text-shadow:
+     -1px -1px 0 #fff,
+      1px -1px 0 #fff,
+     -1px  1px 0 #fff,
+      1px  1px 0 #fff;
+}
+
+.ingame #p{
+    top:10px;
 }
 
 @-webkit-keyframes rubberBand {
@@ -126,12 +219,6 @@ html{
   }
 }
 
-img{
-    display:block;
-    margin:0 auto;
-    padding: 0 20% 5%;
-}
-
 .rubberBand {
   -webkit-animation-duration: 1s;
   animation-duration: 1s;
@@ -155,7 +242,7 @@ h1{
 
     animation-name: rumble;
     animation-duration: .25s;
-    animation-iteration-count: 2;
+    animation-iteration-count: 20;
 }
 
 @-webkit-keyframes rumble {
@@ -172,4 +259,42 @@ h1{
     50% {transform: translate(0px, -4px);}
     75% {transform: translate(-4px, 0px);}
     100% {transform: translate(0px, 2px);}
+}
+
+#menu{
+    -webkit-transform:scale(0);
+    transform:scale(0);
+    height:0;
+}
+
+body.menu #menu{
+    display:block;
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:20px;
+    text-align: center;
+    font-weight:bold;
+    color:white;
+    -webkit-transform:scale(1);
+    transform:scale(1);
+    height:auto;
+}
+
+#menu > div{
+    padding:10px 20px;
+    margin:10px;
+    display:inline-block;
+    cursor: pointer;
+    border-radius: 2px;
+}
+#menu > div:hover{
+    background: #55bbff;
+    transform:scale(1.1);
+}
+
+#menu img{
+    display:block;
+    margin:0 0 10px;
+    padding:0;
 }

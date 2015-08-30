@@ -1,4 +1,4 @@
-var Stats = require('./stats');
+// var Stats = require('./stats');
 var drawCube = require('./drawCube');
 var SpriteLib = require('./sprites.js');
 var sprites = SpriteLib.sprites;
@@ -11,6 +11,7 @@ var touchList = require('./touchlist');
 var jsonStringify = JSON.stringify;
 
 var colorInterface = '#55bbff';
+var ingameclass = 'ingame';
 
 var round = Math.round;
 
@@ -33,13 +34,12 @@ function crawlMap(map, w, h, fn){
 /**
  * Get the position (in pixels) from an isometric tile x,y
  */
-function getIsometricPos(x, y, tileWidth){
-    return [
-        (x - y) * (tileWidth / 2),
-        (x + y) * (tileWidth / 4)
-    ];
-}
+var getIsometricPos = require('./getisometricpos');
 
+
+function getElementHeight(ele){
+    return parseInt(w.getComputedStyle(ele, null).getPropertyValue("height"));
+}
 /**
  * Get the position (in isometric coordinates) from a pixel x,y
  */
@@ -74,17 +74,17 @@ function Game(opts){
 
     // Current viewport. Default to center the map
     var mapHeight = opts.h*tileHalf/4;
-    var viewport = [canvas.width/2, (canvas.height/2-mapHeight)];
+    var viewport = [canvas.width/2, canvas.height/2-mapHeight+tileHalf/4];
     var renderChrome = 1;
 
     //Current drawing position. Global so we can recycle & share between fns.
     var currentCtx;
 
     // Stats object tracks performance. Remove for production.
-    var stats = new Stats();
+    // var stats = new Stats();
 
     // DEBUG: show the path on the map.
-    var debugPath;
+    var currentConnectedPath;
 
     // Create a predetermined buffer of tiles.
     var tileStack = [];
@@ -98,7 +98,11 @@ function Game(opts){
     var time = 0;
 
     // Game score!
-    var points = 0;
+    var totalPoints = 0;
+    var globalPoints=0;
+    if(opts.points){
+        opts.points.innerText = 0;
+    }
 
     // Load up the tile queue & pre-cache all our tiles.
     if(opts.dist){
@@ -129,7 +133,12 @@ function Game(opts){
 
     // Create a graph of overrides so we can mess with tiles.
     var mapOverrides = crawlMap([], opts.w, opts.h, function(){
-        return false;
+        return 0;
+    });
+
+    // Create a graph of overrides so we can mess with tiles.
+    var points = crawlMap([], opts.w, opts.h, function(){
+        return [0,0];
     });
 
     // Fill in any predefined tiles in this level.
@@ -180,26 +189,34 @@ function Game(opts){
         lastHoveredTilePos = getIsometricPos(lastHoveredTileCoords[0], lastHoveredTileCoords[1], tileSize);
 
         // Do this before we do our fat finger munging.
-        if(getTileFromTouch(touch, 0) === 'helipad'){
+        if(getTileFromTouch(touch, 0) === 'helipad' && heliStack.length){
             selectedTile = heliStack[heliStack.length-1];
             playSound('select');
             tileSelectType = 1;
         }
 
+        if(getTileFromTouch(touch, 0) === 'water'){
+            playSound('bloop');
+        }
+
         if(!selectedTile){
             longPress = setTimeout(function(){
                 var touchCurrentSpot = touch.clientX + touch.clientY;
-                if(moves < 10 && opts.bulldozers-- > 0 && touchCurrentSpot-15 < touchStartSpot && touchCurrentSpot+15 > touchStartSpot){
+                if(moves < 10 && touchCurrentSpot-15 < touchStartSpot && touchCurrentSpot+15 > touchStartSpot){
                     displayOffset = 0;
                     var tile = getPixelPosFromTouch(touch);
-                    if(!opts.predef.filter(function(item){
+                    var tileType = getTileFromTouch(touch);
+                    if(tileType && tileType !== opts.base && !opts.predef.filter(function(item){
                         if(tile[0] === item[0] && tile[1] === item[1]){
                             return true;
                         }
                     }).length){
-                        playSound('boom');
                         setTileFromTouch(touch, opts.base);
+                        playSound('boom');
                         rumble();
+                        globalPoints -= 5;
+                        showPoints(tile, -5);
+                        calculateWinState();
                     }
                 }
             }, 400);
@@ -230,14 +247,13 @@ function Game(opts){
         clearTimeout(longPress);
         if(selectedTile){
             if(lastHoveredTileType === 'helipad'){
-                heliStack.push(selectedTile);
-
+                playSound('place');
                 // If we pulled this tile off the helipad then put it back on,
                 // don't shift off the main stack.
                 if(tileSelectType != 1){
+                    heliStack.push(selectedTile);
                     tileStack.shift();
                 }
-                playSound('place');
             } else if(canPlaceTileHere(selectedTile, lastHoveredTileCoords)) {
                 if(sprites[selectedTile+'-base']){
                     selectedTile = selectedTile+'-base';
@@ -245,7 +261,7 @@ function Game(opts){
                 try{
                     setTileFromTouch(lastTouch, selectedTile);
                     playSound('place');
-                    calculatePoints(getPixelPosFromTouch(lastTouch,1));
+                    // calculatePoints(getPixelPosFromTouch(lastTouch,1));
                     // 0 = tileStack, 1 = heliStack.
                     if(tileSelectType === 0){
                         tileStack.shift();
@@ -268,6 +284,7 @@ function Game(opts){
         }
         selectedTile = false;
         tileSelectType = 0;
+        calculatePointsState();
     }
 
     var events = [
@@ -278,9 +295,12 @@ function Game(opts){
         ['mousemove', touchmove],
         ['mouseup', touchend],
     ];
-    events.forEach(function(event){
-        canvas.addEventListener(event[0], event[1], true);
-    });
+    if(!opts.renderOnly){
+        d.body.className = ingameclass;
+        events.forEach(function(event){
+            canvas.addEventListener(event[0], event[1], true);
+        });
+    }
 
     /**
      * Can we place the selected tile here?
@@ -338,9 +358,9 @@ function Game(opts){
     }
 
     function rumble(){
-        document.body.className = 'rumble';
+        d.body.className = ingameclass+' rumble';
         setTimeout(function(){
-            document.body.className = '';
+            d.body.className = ingameclass;
         }, 500);
     }
 
@@ -348,19 +368,37 @@ function Game(opts){
      * Show/hide the tooltip over the top of the game.
      */
     function showTooltip(message, title, tile){
-        var tooltip = opts.tooltip;
+        var tooltip = document.querySelector('#tt');
+        var scrim = document.querySelector('#s');
         title = title ? '<h1>'+title+'</h1>' : '';
         tile = tile ? '<img class="rubberBand" src="'+spriteCache[tile].c.toDataURL()+'">' : '';
-        tooltip.innerHTML = '<a class="close"></a> '+title+message+tile;
+        tooltip.innerHTML = '<div id="tt-inner"><a class="close"></a> '+title+message+tile+'</div>';
         tooltip.style.display = 'block';
-        tooltip.setAttribute('class', 'visible');
-        tooltip.onclick = function(){
-            tooltip.setAttribute('class', '');
+        scrim.style.display = 'block';
+
+        // Copyfit the text to fit the dialog, regardless of screen size.
+        var height = getElementHeight(tooltip);
+        var inner = d.querySelector('#tt-inner');
+        var img = d.querySelector('#tt-inner img');
+        for(var i=50; i>10; i--){
+            inner.style.fontSize = i+'px';
+            if(getElementHeight(inner) < height){
+                break;
+            }
+        }
+
+        tooltip.onclick = function(e){
+            e.preventDefault();
+            d.body.className = ingameclass;
             playSound('select');
             setTimeout(function(){
                 tooltip.style.display = 'none';
-            },1200);
+                scrim.style.display = 'none';
+            },150);
         };
+        scrim.onclick = tooltip.onclick;
+        tooltip.ontouchstart = tooltip.onclick;
+        d.body.className = ingameclass+' tt';
         setTimeout(function(){
             playSound('dialog');
         },10);
@@ -402,6 +440,9 @@ function Game(opts){
             events.forEach(function(event){
                 canvas.removeEventListener(event[0], event[1], true);
             });
+
+            d.body.className = '';
+
             if(cb){
                 cb();
             }
@@ -414,7 +455,7 @@ function Game(opts){
     this.ss = function(){
         renderChrome = 0;
         drawMap();
-        var a = document.createElement('a');
+        var a = d.createElement('a');
         a.setAttribute('download', 'screenshot.png');
         a.href = canvas.toDataURL('image/png');
         a.click();
@@ -431,49 +472,107 @@ function Game(opts){
     ];
 
     function calculatePoints(here){
+        // Look on each side of the tile.
         trafficDirections.forEach(function(dir){
             var pos = [
                 here[0]+dir[1][0],
                 here[1]+dir[1][1]
             ];
             try{
+                // Work out which tile we're looking at.
                 var thisTile = map[pos[0]][pos[1]];
+                // If this tile gives us points
                 if(tileLogic[thisTile]){
-                    points += showPoints(pos, tileLogic[thisTile].points || 0);
+                    // Work out how many points
+                    var thesePoints = tileLogic[thisTile].points || 0;
+
+                    // Then set the points for this tile.
+                    points[pos[0]][pos[1]] = [
+                        thesePoints,
+                        points[pos[0]][pos[1]][0] !== thesePoints, // Flags that this tile has changed.
+                        1
+                    ];
+                } else {
+
+                    // Set no points for this tile, flagging if it's changed.
+                    points[pos[0]][pos[1]] = [
+                        0,
+                        points[pos[0]][pos[1]][0] !== 0,
+                        1
+                    ];
                 }
             }catch(e){}
         });
     }
 
-    var visiblePoints = [];
-    function showPoints(here, howMany, color){
-        if(howMany){
-            var pos = getIsometricPos(here[0], here[1], tileSize);
-            visiblePoints.push([now, howMany, pos]);
+    function calculatePointsState(path){
+        if(!currentConnectedPath){
+            return;
         }
+        currentConnectedPath.forEach(function(tile){
+            calculatePoints(tile);
+        });
+        totalPoints = 0;
+        crawlMap(points, opts.w, opts.h, function(x, y, points){
+            // 0: points
+            // 1: Have these changed from last time
+            // 2: Do we need to invalidate this
+
+            // If we need to invalidate this, do so.
+            if(!points[2] && points[0]){
+                showPoints([x,y], 0 - points[0]);
+                points[0] = 0;
+            } else if(points[1]){
+                showPoints([x,y], points[0]);
+            }
+
+            // reset our changed flag.
+            points[1] = 0;
+            points[2] = 0;
+            totalPoints += points[0];
+            updatePointsDisplay();
+        });
+    }
+
+    var visiblePoints = [];
+    function showPoints(here, howMany){
+        if(howMany){
+            visiblePoints.push([
+                now,
+                howMany,
+                getIsometricPos(here[0], here[1], tileSize),
+                howMany > 1 // Color flag
+            ]);
+        }
+        updatePointsDisplay();
         return howMany;
+    }
+    function updatePointsDisplay(){
+        opts.points.innerText = totalPoints + globalPoints;
     }
     function drawPoints(){
         ctx.font = "bold 16px serif";
         ctx.strokeStyle = '#fff';
-        ctx.fillStyle = colorInterface;
         ctx.lineWidth = 5;
         if(visiblePoints.length){
             visiblePoints = visiblePoints.filter(function(spec,i){
                 var diff = now - spec[0];
-                if(diff < 500){
+                if(diff < 1000){
                     var args = [
                         spec[1],
-                        spec[2][0] + viewport[0] + Math.sin(now/500+130*i)*5,
+                        spec[2][0] + viewport[0],
                         spec[2][1] + viewport[1] - diff/1000*tileHalf - tileHalf
                     ];
+                    ctx.globalAlpha = 1-(diff/1000);
+                    ctx.fillStyle = spec[3] ? colorInterface : '#FF5566';
                     ctx.strokeText.apply(ctx,args);
                     ctx.fillText.apply(ctx,args);
-                } else if(diff > 500){
+                } else if(diff > 1000){
                     return false;
                 }
                 return true;
             });
+            ctx.globalAlpha = 1;
         }
     }
 
@@ -554,20 +653,22 @@ function Game(opts){
      */
     function calculateWinState(){
         var result = getCalculatedTrafficPath();
-        debugPath = result.win || result.lose;
+        currentConnectedPath = result.win || result.lose;
         if(result && result.win){
             var sinPath = function(layer, coords){
                 if(now > this.start && now < this.end){
                     layer[1] += 0-(Math.sin((now-this.start)/125))*20;
                     if(!this.s){
                         this.s = 1;
-                        // calculatePoints(coords);
+                        calculatePoints(coords);
                     }
                 }
             };
             result.win.forEach(function(coords, i){
                 setTimeout(function(){
                     playSound('ping');
+                    showPoints(coords, 10);
+                    globalPoints += 10;
                 }, i*100);
                 mapOverrides[coords[0]][coords[1]] = {
                     fn: sinPath,
@@ -627,7 +728,7 @@ function Game(opts){
      * Draw a layer at currentDrawPos
      * @param  {Array} layer Array layer containing params to draw
      */
-    function drawLayer(layer){
+    function drawLayer(layer, ctxOverride){
         if(layer.length === 4){
             var layerPos = getIsometricPos(layer[2], layer[3], tileSize);
             currentCtx.translate(0 - layerPos[0] - layer[1], 0 - layerPos[1]);
@@ -659,7 +760,7 @@ function Game(opts){
     function cacheSprite(tile, spriteCanvas, seed){
         if(!spriteCanvas){
             spriteCanvas = {
-                c: document.createElement('canvas'),
+                c: d.createElement('canvas'),
                 seed: seed
             };
             spriteCanvas.c.width = tileSize+1;
@@ -722,7 +823,7 @@ function Game(opts){
         return 0 - tileHalf/2 + (opts.queue - i - 1)*(tileHalf+spacing);
     }
 
-    var tileQueueCanvas = document.createElement('canvas');
+    var tileQueueCanvas = d.createElement('canvas');
     tileQueueCanvas.width = getTileQueuePos(0) + tileSize;
     tileQueueCanvas.height = tileHalf+2;
     var tileQueueContext = tileQueueCanvas.getContext('2d');
@@ -791,51 +892,56 @@ function Game(opts){
         }
         time = (time * 0.9 + (Date.now() - now) * 0.1);
         now = Date.now();
-        stats.begin();
+        // stats.begin();
         ctx.fillStyle = '#191F27';
-        ctx.fillRect(0,0,canvas.width,canvas.height);
+        if(!opts.renderOnly){
+            ctx.fillRect(0,0,canvas.width,canvas.height);
+        }
         ctx.translate(viewport[0], viewport[1]);
         crawlMap(map, opts.w, opts.h, drawSprite);
         ctx.translate(0-viewport[0], 0-viewport[1]);
-        drawTileQueue();
-        if(selectedTile && isTouching){
-            ctx.drawImage(
-                spriteCache[selectedTile].c, // cached canvas tile
-                lastTouch.clientX - tileSize/2, // x
-                lastTouch.clientY - tileSize*1.25  - displayOffset
-            );
+        if(!opts.renderOnly){
+            drawTileQueue();
+            if(selectedTile && isTouching){
+                ctx.drawImage(
+                    spriteCache[selectedTile].c, // cached canvas tile
+                    lastTouch.clientX - tileSize/2, // x
+                    lastTouch.clientY - tileSize*1.25  - displayOffset
+                );
 
-            if(lastHoveredTilePos && map[lastHoveredTileCoords[0]] && map[lastHoveredTileCoords[0]][lastHoveredTileCoords[1]]){
-                var indicatorTileName = lastHoveredTileType === 'helipad' || canPlaceTileHere(selectedTile, lastHoveredTileCoords) ? 'ok' : 'notok';
-                ctx.drawImage(spriteCache[indicatorTileName].c, lastHoveredTilePos[0] - tileSize/2 + viewport[0], lastHoveredTilePos[1] - tileSize*1.5 + viewport[1]);
+                if(lastHoveredTilePos && map[lastHoveredTileCoords[0]] && map[lastHoveredTileCoords[0]][lastHoveredTileCoords[1]]){
+                    var indicatorTileName = lastHoveredTileType === 'helipad' || canPlaceTileHere(selectedTile, lastHoveredTileCoords) ? 'ok' : 'notok';
+                    ctx.drawImage(spriteCache[indicatorTileName].c, lastHoveredTilePos[0] - tileSize/2 + viewport[0], lastHoveredTilePos[1] - tileSize*1.5 + viewport[1]);
+                }
             }
+            drawPoints();
         }
-        drawPoints();
 
-        // if(debugPath){
-        //     debugPath.map(function(tile){
+        // if(currentConnectedPath){
+        //     currentConnectedPath.map(function(tile){
         //         var pos = getIsometricPos(tile[0], tile[1], tileSize);
         //         ctx.drawImage(spriteCache.ok.c, pos[0] - tileSize/2 + viewport[0], pos[1] - tileSize*1.5 + viewport[1]);
         //     });
         // }
-        stats.end();
+        // stats.end();
         // setTimeout(drawMap, 1);
         if(keepRendering !== false){
             requestAnimationFrame(drawMap);
         }
     }
 
-    drawMap();
-    // if(opts.onload){
-    //     opts.onload.call(_this);
-    // }
-    if(opts.intro){
-        showTooltip.apply(this, opts.intro);
-    }
+    drawMap(!opts.renderOnly);
 
-    setInterval(function(){
-        console.log('fps',1000/time);
-    },1000);
+
+    if(!opts.renderOnly){
+        if(opts.intro){
+            showTooltip.apply(this, opts.intro);
+        }
+
+        // setInterval(function(){
+        //     console.log('fps',1000/time);
+        // },1000);
+    }
 }
 
 module.exports = Game;

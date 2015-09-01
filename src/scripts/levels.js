@@ -72,11 +72,12 @@ module.exports = {
             predef: [
                 [3,5,roadBase],
                 [1,0,roadBase],
-                [0,0,'helipad'],
+                [1,3,'helipad'],
                 [1,2,forest],
                 [2,3,forest],
                 [3,3,forest],
             ],
+            intro: ['Building road past special tiles like forests or the helipad gives you extra points.', 'Bonus points', 'forest']
         },
         {
             seed:13,
@@ -111,7 +112,7 @@ module.exports = {
             wMod:4,
             base: 'sand',
             strict: 1,
-            dist:[0,1,2,0,5,3,4,6,7,1,1,5,5,4,4,1,0],
+            dist:[0,1,2,0,5,3,4,6,7,1,1,5,5,4,4,1,3],
             predef: (function(){
                 var a = [
                     [3,7,roadBase],
@@ -132,7 +133,7 @@ module.exports = {
 
                 return a;
             })(),
-            intro: ['There may be multiple ways to complete a level. See how many points you can get.', 'Many ways', 'sand']
+            intro: ['There may be multiple ways to complete a level. Build a road past the heliport for extra points.', 'Many ways', 'sand']
         }
     ],
     Casual: [

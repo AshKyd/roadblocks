@@ -12,6 +12,14 @@ html{
     transition:opacity .15s, left .15s, transform .15s, top .15s;
 }
 
+#tt,
+#tt-inner,
+.close{
+    border:3px solid #4AADFF;
+    border-radius: 8px;
+    color: #2C70A8;
+}
+
 #tt{
     display:block;
     position:absolute;
@@ -20,21 +28,35 @@ html{
     left:30px;
     right:50px;
     padding: 20px;
-    background: #fff;
     z-index:10;
-    border-radius:2px;
+    border-radius:10px;
     font-size:2em;
     -webkit-transform: scale(0);
     transform: scale(0);
+    background: rgba(74, 173, 255, .6);
+    box-shadow: 0 0 1em black;
 }
-@media(min-width: 800px){
-    #tt{
-        padding:20px 40px;
-        left:150px;
-        right:150px;
-        top:100px;
-        bottom:100px;
-    }
+
+#tt-inner{
+    background: rgba(255,255,255,.8);
+    padding:10px 30px;
+}
+
+.close{
+    position:absolute;
+    bottom:20px;
+    right:20px;
+    background: #CCE7FE;
+    font-weight:bold;
+    display:block;
+    font-size:24px;
+    text-align:center;
+    line-height:45px;
+    cursor: pointer;
+    padding: 0 2em;
+}
+.close:hover{
+    transform: scale(1.05);
 }
 
 .ingame.tt #tt{
@@ -59,32 +81,43 @@ html{
 
 #tt img{
     display:block;
-    margin:-15% auto 0;
+    margin:-20% auto 0;
     padding-bottom:20px;
+    max-width:200px;
 }
 
-@media(max-height:768px){
-    #tt img{
-        max-height: 300px;
+@media(min-width: 800px){
+    #tt{
+        left:20%;
+        right:20%;
+        top:100px;
+        bottom:100px;
     }
 }
 
-.close{
-    position:absolute;
-    top:10px;
-    right:10px;
-    background:#4AADFF;
-    font-weight:bold;
-    border-radius:2px;
-    display:block;
-    font-size:24px;
-    line-height:1.5em;
-    width:1.5em;
-    text-align:center;
-    color:white;
+@media(max-height:768px){
+    #tt{
+        top:0;
+        left:0;
+        bottom:0;
+        right:0;
+        border-radius:0;
+        border:none;
+    }
+    #tt img{
+        max-height: 200px;
+    }
 }
-.close:after{
-    content:"×";
+
+@media(max-height:480px){
+    #tt{
+        padding-left: 150px;
+    }
+    #tt img{
+        position:absolute;
+        left:20px;
+        top:50px;
+    }
 }
 
 /* buttons */
@@ -231,7 +264,7 @@ html{
 }
 
 h1{
-    font-size:1em;
+    font-size:1.2em;
     font-weight:bold;
 }
 

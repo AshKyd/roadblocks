@@ -54,6 +54,9 @@ var actions = {
     Casual: function(){
         loadGame('Casual', 0);
     },
+    Free: function(){
+
+    }
 };
 
 d.body.onclick = function(e){
@@ -73,37 +76,37 @@ function loadGame(gameType, levelId){
     levelId = Number(levelId);
     var level = levels[gameType][levelId];
     if(!level){
-        alert('you won everything');
-        showMenu();
+        if(thisGame){
+            thisGame.tt(
+                "Congratulations, you've finished all the levels. Be sure to share this game with your friends!",
+                'You won!',
+                0,
+                showMenu
+            );
+
+        } else {
+            showMenu();
+        }
         return;
     }
 
-    thisGame = new Game({
-        tileSize: ((canvas.width + canvas.height)/2 - 30)/(level.wMod || level.w),
-        w: level.w,
-        h: level.h,
-        canvas: canvas,
-        tooltip: tooltip,
-        points: points,
-        base: level.base,
-        predef: level.predef,
-        seed: level.seed,
-        dist: level.dist,
-        intro: level.intro,
-        strict: level.strict,
-        queue:4,
-        onwin: function(){
-            thisGame.destroy();
-            loadGame(gameType, levelId+1);
-            w.location.hash = gameType+'-'+(levelId+1);
-        },
-        onlose: function(){
-            thisGame.destroy(function(){
-                thisGame.showTooltip.apply(thisGame, ['Look like you got stuck. Tap to try again.', 'Level failed']);
-                loadGame(gameType, levelId);
-            });
-        }
-    });
+    level.canvas = canvas;
+    level.points = 0;
+
+    level.onwin = function(){
+        thisGame.destroy();
+        loadGame(gameType, levelId+1);
+        w.location.hash = gameType+'-'+(levelId+1);
+    };
+
+    level.onlose = function(){
+        thisGame.destroy(function(){
+            thisGame.showTooltip.apply(thisGame, ['Look like you got stuck. Tap to try again.', 'Level failed']);
+            loadGame(gameType, levelId);
+        });
+    };
+
+    thisGame = new Game(level);
 }
 
 function showMenu(){

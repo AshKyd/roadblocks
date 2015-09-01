@@ -56,21 +56,51 @@ function Game(opts){
     var ctx = canvas.getContext('2d');
     var running = true;
 
+    // Size of the visible queue
+    var queueSize = 4;
+
     // Spacing amount used in the interface.
     var spacing = 15;
 
-    var trafficPath = [];
-
     // Tile size helpers
-    var tileSize = opts.tileSize;
-    var tileHalf = tileSize / 2;
-    var tileDepth = tileSize / 10;
+    var tileSize, tileHalf, tileDepth;
+
+    var tileQueueCanvas = d.createElement('canvas');
+    var tileQueueContext = tileQueueCanvas.getContext('2d');
+
+    // Cache of rendered sprites
+    // The preexisting ones will be cached ahead of time so we can use them
+    // without explicitly having to draw them.
+    var spriteCache = {
+        ok:1,
+        notok:1,
+        dump:1,
+    };
+
+    // Resize handler. Sets sizing when viewport changes.
+    function resize(){
+        if(!opts.renderOnly){
+            canvas.width = w.innerWidth;
+            canvas.height = w.innerHeight;
+        }
+        tileSize = ((canvas.width + canvas.height)/2 - 30)/(opts.wMod || opts.w);
+        tileHalf = tileSize / 2;
+        tileDepth = tileSize / 10;
+
+        // Resize tileQueue
+        tileQueueCanvas.width = getTileQueuePos(0) + tileSize;
+        tileQueueCanvas.height = tileHalf+2;
+
+        Object.keys(spriteCache).map(function(key){
+            cacheSprite(key);
+        });
+    }
+    resize();
+
+    var trafficPath = [];
 
     // Display offset. Compensates for big fat fingers when touching.
     var displayOffset;
-
-    // Cache of rendered sprites
-    var spriteCache = {};
 
     // Current viewport. Default to center the map
     var mapHeight = opts.h*tileHalf/4;
@@ -118,11 +148,6 @@ function Game(opts){
         }
     }
 
-    // Cache some stuff we know we're going to use.
-    ['ok','notok','dump'].map(function(thisTile){
-        cacheSprite(thisTile);
-    });
-
     // Bounds for latest selectable tile.
     var tileQueueBounds = getTileQueuePos(0);
 
@@ -146,7 +171,7 @@ function Game(opts){
         map[theseOpts[0]][theseOpts[1]] = theseOpts[2];
     });
 
-    // Add listeners.
+    // Touch & movement states
     var lastTouch = false;
     var moves;
     var longPress;
@@ -189,14 +214,16 @@ function Game(opts){
         lastHoveredTilePos = getIsometricPos(lastHoveredTileCoords[0], lastHoveredTileCoords[1], tileSize);
 
         // Do this before we do our fat finger munging.
-        if(getTileFromTouch(touch, 0) === 'helipad' && heliStack.length){
+        var tileundertouch = getTileFromTouch(touch, 0);
+        if(tileundertouch === 'helipad' && heliStack.length){
             selectedTile = heliStack[heliStack.length-1];
             playSound('select');
             tileSelectType = 1;
         }
 
-        if(getTileFromTouch(touch, 0) === 'water'){
+        if(tileundertouch === 'water'){
             playSound('bloop');
+            explode(getPixelPosFromTouch(touch), colorInterface);
         }
 
         if(!selectedTile){
@@ -218,9 +245,10 @@ function Game(opts){
                     if(tileType && tileType !== opts.base && !predefs.length){
                         setTileFromTouch(touch, opts.base);
                         playSound('boom');
+                        explode(tile);
                         rumble();
-                        globalPoints -= 5;
-                        showPoints(tile, -5);
+                        globalPoints -= 15;
+                        showPoints(tile, -15);
                         calculateWinState();
                     }
                 }
@@ -293,6 +321,7 @@ function Game(opts){
     }
 
     var events = [
+        ['resize', resize, window],
         ['touchstart', touchstart],
         ['touchmove', touchmove],
         ['touchend', touchend],
@@ -303,8 +332,60 @@ function Game(opts){
     if(!opts.renderOnly){
         d.body.className = ingameclass;
         events.forEach(function(event){
-            canvas.addEventListener(event[0], event[1], true);
+            (event[2] || canvas).addEventListener(event[0], event[1], true);
         });
+    }
+
+    var particles = [];
+    var particleSize = tileSize/30;
+    function explode(pos, color){
+        for(var i=0; i<8; i++){
+            particles.push([
+                now,
+                pos[0],
+                pos[1],
+                Math.random()*2-1,
+                Math.random()*2-1,
+                1.5,
+                500,
+                color || '#C8AF9E'
+            ]);
+        }
+    }
+
+    function drawParticles(){
+        if(particles.length){
+            particles = particles.filter(function(p){
+                var diff = (now - p[0])/(p[6]);
+                var x = p[1] + p[3] * diff;
+                var y = p[2] + p[4] * diff;
+                var z = (p[5]*tileHalf*diff)*(1-diff*diff);
+                var pos = getIsometricPos(x, y, tileSize);
+                // ctx.fillRect(pos[0] + viewport[0], pos[1] + viewport[1], 5, 5);
+                drawCube(ctx,
+                    pos[0] + viewport[0],
+                    pos[1] + viewport[1] - z,
+                    particleSize,
+                    particleSize,
+                    particleSize,
+                    p[7],
+                    diff > 0.5 ? 1 - (diff-0.5)*2 : 1
+                );
+                // drawCube(ctx,
+                //     pos[0] + viewport[0],
+                //     pos[1] + viewport[1],
+                //     particleSize,
+                //     particleSize,
+                //     0,
+                //     '#000000',
+                //     0.25,
+                //     1-diff
+                // );
+                if(diff*p[6] < p[6]){
+                    return true;
+                }
+            });
+        }
     }
 
     /**
@@ -372,12 +453,12 @@ function Game(opts){
     /**
      * Show/hide the tooltip over the top of the game.
      */
-    function showTooltip(message, title, tile){
+    function showTooltip(message, title, tile, cb){
         var tooltip = document.querySelector('#tt');
         var scrim = document.querySelector('#s');
         title = title ? '<h1>'+title+'</h1>' : '';
         tile = tile ? '<img class="rubberBand" src="'+spriteCache[tile].c.toDataURL()+'">' : '';
-        tooltip.innerHTML = '<div id="tt-inner"><a class="close"></a> '+title+message+tile+'</div>';
+        tooltip.innerHTML = '<div id="tt-inner"><a class="close">OK</a> '+title+message+tile+'</div>';
         tooltip.style.display = 'block';
         scrim.style.display = 'block';
 
@@ -385,9 +466,9 @@ function Game(opts){
         var height = getElementHeight(tooltip);
         var inner = d.querySelector('#tt-inner');
         var img = d.querySelector('#tt-inner img');
-        for(var i=50; i>10; i--){
+        for(var i=35; i>10; i--){
             inner.style.fontSize = i+'px';
-            if(getElementHeight(inner) < height){
+            if(getElementHeight(inner) < height - 80){
                 break;
             }
         }
@@ -400,6 +481,9 @@ function Game(opts){
                 tooltip.style.display = 'none';
                 scrim.style.display = 'none';
             },150);
+            if(cb){
+                cb();
+            }
         };
         scrim.onclick = tooltip.onclick;
         tooltip.ontouchstart = tooltip.onclick;
@@ -408,7 +492,7 @@ function Game(opts){
             playSound('dialog');
         },10);
     }
-    _this.showTooltip = showTooltip;
+    _this.tt = showTooltip;
 
     /**
      * Fall away animation for use in mapOverrides/this.destroy
@@ -443,7 +527,7 @@ function Game(opts){
 
             // tear down the infrastructure.
             events.forEach(function(event){
-                canvas.removeEventListener(event[0], event[1], true);
+                (event[2] || canvas).removeEventListener(event[0], event[1], true);
             });
 
             d.body.className = '';
@@ -461,6 +545,7 @@ function Game(opts){
         renderChrome = 0;
         drawMap();
         var a = d.createElement('a');
+        a.setAttribute('target', '_blank');
         a.setAttribute('download', 'screenshot.png');
         a.href = canvas.toDataURL('image/png');
         a.click();
@@ -825,13 +910,8 @@ function Game(opts){
     }
 
     function getTileQueuePos(i){
-        return 0 - tileHalf/2 + (opts.queue - i - 1)*(tileHalf+spacing);
+        return 0 - tileHalf/2 + (queueSize - i - 1)*(tileHalf+spacing);
     }
-
-    var tileQueueCanvas = d.createElement('canvas');
-    tileQueueCanvas.width = getTileQueuePos(0) + tileSize;
-    tileQueueCanvas.height = tileHalf+2;
-    var tileQueueContext = tileQueueCanvas.getContext('2d');
 
     function drawTileQueue(){
         if(!renderChrome){
@@ -848,7 +928,7 @@ function Game(opts){
         }
 
 
-        for(i=0; i<opts.queue; i++){
+        for(i=0; i<queueSize; i++){
             var tile = tileStack[i];
             if(typeof tile === 'undefined'){
                 continue;
@@ -921,6 +1001,7 @@ function Game(opts){
             }
             drawPoints();
         }
+        drawParticles();
 
         // if(currentConnectedPath){
         //     currentConnectedPath.map(function(tile){

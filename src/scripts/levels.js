@@ -285,9 +285,11 @@ Object.keys(levels).forEach(function(key){
                 level.dist ? level.dist.join('') : 0,
                 '-',
                 level.predef,
-            ].join(''),
-            level.intro ? level.intro : 0
+            ].join('')
         ];
+        if(level.intro){
+            entry.push(level.intro);
+        }
         return entry;
     });
 });

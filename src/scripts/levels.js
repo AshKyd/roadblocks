@@ -274,15 +274,18 @@ Object.keys(levels).forEach(function(key){
         }).join('');
 
         var entry = [
-            level.seed,
             [
+                level.seed,
+                '-',
                 level.w,
                 level.h,
                 level.wMod || level.w,
                 enc(spriteIndex.indexOf(level.base)),
-            ].join('') + level.predef,
-            level.strict ? 1 : 0,
-            level.dist ? level.dist.join('') : 0,
+                level.strict ? 1 : 0,
+                level.dist ? level.dist.join('') : 0,
+                '-',
+                level.predef,
+            ].join(''),
             level.intro ? level.intro : 0
         ];
         return entry;

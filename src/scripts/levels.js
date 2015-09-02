@@ -1,3 +1,5 @@
+var SpriteLib = require('./sprites');
+
 function addRow(a, x, max, type){
     for(var i=0;i<max;i++){
         a.push([x,i,type]);
@@ -13,7 +15,7 @@ var roadBase = 'roady-base';
 var forest = 'forest';
 var water = 'water';
 
-module.exports = {
+var levels = {
     Puzzle: [
         { // intro level. 0
             seed: 100,
@@ -221,3 +223,74 @@ module.exports = {
         }
     ]
 };
+
+// 3.61 kb - beginning
+// 2.75 - after index
+// 2.45 after combining predef array
+//
+var spriteIndex = Object.keys(SpriteLib.sprites);
+function enc(num){
+    return String.fromCharCode(num+48);
+}
+
+Object.keys(levels).forEach(function(key){
+    levels[key] = levels[key].map(function(level, levelId){
+
+        var exists = {};
+
+        // Remove duplicates.
+        // * Keep only the latest instance of
+
+        for(var i=level.predef.length-1; i>1; i--){
+            var tile = level.predef[i];
+            if(
+                i > 1 &&
+                (tile[0] !== level.predef[0][0] || tile[1] !== level.predef[0][1]) &&
+                (tile[0] !== level.predef[1][0] || tile[1] !== level.predef[1][1])
+            ){
+                exists[tile[0]+'-'+tile[1]] = tile;
+            } else {
+                if(i>1){
+                    console.log('skipping', tile, exists[tile[0]+'-'+tile[1]]);
+                }
+            }
+        }
+
+        console.log('exists', exists, level.predef);
+
+        var existsArr = Object.keys(exists).map(function(key){
+            return exists[key];
+        });
+
+        existsArr.unshift(level.predef[1]);
+        existsArr.unshift(level.predef[0]);
+
+        console.log('Saved ',(level.predef.length - existsArr.length) * 3,'bytes');
+
+        level.predef = existsArr;
+
+        // Flatten
+        level.predef = level.predef.map(function(predef){
+            var index = spriteIndex.indexOf(predef[2]);
+            console.log('encing', index, enc(index));
+            predef[2] = enc(index);
+            return predef.join('');
+        }).join('');
+
+        var entry = [
+            level.seed,
+            level.w,
+            level.h,
+            level.wMod || level.w,
+            enc(spriteIndex.indexOf(level.base)),
+            level.predef,
+            level.strict ? 1 : 0,
+            level.dist ? level.dist.join('') : 0,
+            level.intro ? level.intro : 0
+        ];
+        return entry;
+    });
+});
+console.log(JSON.stringify(levels));
+
+module.exports = levels;

@@ -7,7 +7,7 @@ canvas.height = w.innerHeight;
 var ctx = canvas.getContext('2d');
 var tooltip = d.querySelector('#tt');
 var points = d.querySelector('#p');
-var levels = require('./levels');
+var levels = require('./l');
 var logo = require('./logo');
 var playSound = require('./sfx');
 
@@ -101,7 +101,7 @@ function loadGame(gameType, levelId){
 
     level.onlose = function(){
         thisGame.destroy(function(){
-            thisGame.showTooltip.apply(thisGame, ['Look like you got stuck. Tap to try again.', 'Level failed']);
+            thisGame.tt.apply(thisGame, ['Look like you got stuck. Tap to try again.', 'Level failed']);
             loadGame(gameType, levelId);
         });
     };

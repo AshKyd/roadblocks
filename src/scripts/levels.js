@@ -1,3 +1,5 @@
+// FIXME: shim for loading spriteLib in nodejs
+global.innerWidth = 0;
 var SpriteLib = require('./sprites');
 
 function addRow(a, x, max, type){
@@ -236,11 +238,9 @@ function enc(num){
 Object.keys(levels).forEach(function(key){
     levels[key] = levels[key].map(function(level, levelId){
 
-        var exists = {};
-
         // Remove duplicates.
         // * Keep only the latest instance of
-
+        var exists = {};
         for(var i=level.predef.length-1; i>1; i--){
             var tile = level.predef[i];
             if(
@@ -251,13 +251,10 @@ Object.keys(levels).forEach(function(key){
                 exists[tile[0]+'-'+tile[1]] = tile;
             } else {
                 if(i>1){
-                    console.log('skipping', tile, exists[tile[0]+'-'+tile[1]]);
+                    console.log('skipping duplicate tile', tile, exists[tile[0]+'-'+tile[1]]);
                 }
             }
         }
-
-        console.log('exists', exists, level.predef);
-
         var existsArr = Object.keys(exists).map(function(key){
             return exists[key];
         });
@@ -272,18 +269,18 @@ Object.keys(levels).forEach(function(key){
         // Flatten
         level.predef = level.predef.map(function(predef){
             var index = spriteIndex.indexOf(predef[2]);
-            console.log('encing', index, enc(index));
             predef[2] = enc(index);
             return predef.join('');
         }).join('');
 
         var entry = [
             level.seed,
-            level.w,
-            level.h,
-            level.wMod || level.w,
-            enc(spriteIndex.indexOf(level.base)),
-            level.predef,
+            [
+                level.w,
+                level.h,
+                level.wMod || level.w,
+                enc(spriteIndex.indexOf(level.base)),
+            ].join('') + level.predef,
             level.strict ? 1 : 0,
             level.dist ? level.dist.join('') : 0,
             level.intro ? level.intro : 0

@@ -20,7 +20,7 @@
  * y (y position)
  */
 
-var exaggeration = window.innerWidth < 800 ? 2 : 1;
+var exaggeration = innerWidth < 800 ? 2 : 1;
 
 var random = require('./random');
 var roadColor = '#444444';

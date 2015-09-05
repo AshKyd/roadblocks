@@ -1,5 +1,7 @@
 // FIXME: shim for loading spriteLib in nodejs
-global.innerWidth = 0;
+if(typeof window === 'undefined'){
+    global.innerWidth = 0;
+}
 var SpriteLib = require('./sprites');
 
 function addRow(a, x, max, type){
@@ -31,7 +33,7 @@ var levels = {
                 [2,0,roadBase],
                 [1,2,forest],
             ],
-            intro: ['Connect from left to right by dragging tiles from the top.', 'New game', roadBase],
+            intro: ['Connect from left to right by dragging tiles from the top.', 'Left to right', roadBase],
         },
         { // introduction to intersections 1
             seed: 100,
@@ -60,7 +62,7 @@ var levels = {
                 [3,0,roadBase],
                 [0,0,'helipad'],
             ],
-            intro: ['The helipad can stack tiles for later. Use this to reverse the order of your tiles.', 'Helipad', 'helipad']
+            intro: ['Use the helipad to reverse the order of your tiles.', 'Stack tiles for later', 'helipad']
         },
         { // first open level 3
             seed: 12,
@@ -82,6 +84,42 @@ var levels = {
                 [3,3,forest],
             ],
             intro: ['Building road past special tiles like forests or the helipad gives you extra points.', 'Bonus points', 'forest']
+        },
+        { // 5
+            seed: 100,
+            w:6,
+            h:6,
+            wMod:4,
+            base: 'grass',
+            dist: [
+                'roadx2yl',
+                'roady2xl',
+                'roadx',
+                'roadxy',
+                'roadx2yl',
+                'roadx2yr',
+                'roady2xr',
+                'roadx2yl',
+                'roadx',
+                'roady2xl',
+                'roady2xr',
+                'roady',
+            ],
+            predef: (function(){
+                var a = [
+                    [1,5,roadBase],
+                    [1,0,roadBase],
+                    [0,5,forest],
+                ];
+                addRow(a, 4, 6, 'sand');
+                addRow(a, 5, 6, 'water');
+                addCol(a, 3, 6, 'water');
+                a.push([3,3,'broady']);
+                a.push([4,0,'palm']);
+                a.push([4,0,'palm']);
+                return a;
+            })(),
+            intro: ['Long press to bulldoze a tile you no longer need.', 'Bulldoze', 'dump'],
         },
         {
             seed:13,
@@ -107,7 +145,6 @@ var levels = {
                 a.push([4,3,'broady']);
                 return a;
             })(),
-            intro: ['Long press to bulldoze a tile you no longer need.', 'Bulldoze', 'dump'],
         },
         {
             seed: 14,
@@ -137,92 +174,136 @@ var levels = {
 
                 return a;
             })(),
-            intro: ['There may be multiple ways to complete a level. Build a road past the heliport for extra points.', 'Many ways', 'sand']
-        }
+            intro: ['There are several ways to finish this level. See if you can build past the helipad.', 'Many ways', 'sand']
+        },
+
+            { // 4
+                seed: 200,
+                w: 6,
+                h:6,
+                base:'grass',
+                dist: [
+                    'roady2xr',
+                    'roady2xl',
+                    'roady',
+                    'roadx2yl',
+                    'roadxy',
+                    'roadx',
+                    'roadxy',
+                    'roadxy',
+                    'roadx2yl',
+                    'roady2xr',
+                    'roadx2yr',
+                    'roady2xl',
+                    'roadx2yr',
+                    'roadxy',
+                ],
+                predef: (function(){
+                    var end = [4,0,'roady-base'];
+                    var a = [
+                        [1,5,'roady-base'],
+                        end,
+                        [1,1,'building'],
+                    ];
+                    addRow(a, 4, 6, 'sand');
+                    addRow(a, 5, 6, 'water');
+                    a.push(end); // double up, addBeach overwrote this
+                    a.push([4,5,'palm']);
+                    a.push([4,4,'palm']);
+                    a.push([3,5,'helipad']);
+                    return a;
+                })(),
+            },
+            { // 6
+                seed: 301,
+                w:7,
+                h:7,
+                wMod: 4,
+                base: 'sand',
+                dist: [
+                    'roady',
+                    'roadx2yl',
+                    'roadx2yl',
+                    'roady2xr',
+                    'roady2xl',
+                    'roadx',
+                    'roadx',
+                    'roadx',
+                    'roadxy',
+                    'roadx',
+                    'roadx',
+                    'roadx2yr',
+                    'roady',
+                    'roadx',
+                    'roadx',
+                ],
+                predef: (function(){
+                    var a = [
+                        [5,6,roadBase],
+                        [0,2,'roadx-base'],
+                        [4,1,'palm'],
+                        [1,3,'water'],
+                        [1,1,'water'],
+                        [1,2,'broadx'],
+                        [2,3,'water'],
+                        [3,3,'palm'],
+                        [0,3,'palm'],
+                        [3,6,'building'],
+                        [5,2,'helipad'],
+                        [5,1,water],
+                    ];
+                    addRow(a, 6, 7, 'water');
+                    addCol(a, 0, 7, 'water');
+                    return a;
+                })(),
+            },
+            { // 7
+                seed: 400,
+                w:7,
+                h:7,
+                wMod: 4,
+                base:'grass',
+                dist: [
+                    'roadx2yr',
+                    'roady2xl',
+                    'roadx',
+                    'roadx2yr',
+                    'roadx',
+                    'roadx2yr',
+                    'roady',
+                    'roady2xl',
+                    'roady',
+                ],
+                predef: (function(){
+                    var a = [
+                        [6,2,'roadx-base'],
+                        [0,4,'roadx-base'],
+                        [6,1,'palm'],
+                        [6,0,'water'],
+                        [5,1,'sand'],
+                        [5,0,'water'],
+                        [4,0,'water'],
+                        [4,1,'water'],
+                        [4,2,'water'],
+                        [3,2,'water'],
+                        [3,3,'broadx'],
+                        [3,4,'broadx'],
+                        [3,5,'water'],
+                        [3,6,'water'],
+                        [2,6,'water'],
+                        [1,6,'water'],
+                        [4,6,'water'],
+                        [4,5,'water'],
+                        [3,0,'palm'],
+                        [3,1,'sand'],
+                        [2,5,'helipad'],
+                        [1,1,'forest'],
+                    ];
+                    return a;
+                })(),
+            }
     ],
     Casual: [
-        { // 4
-            seed: 200,
-            w: 6,
-            h:6,
-            base:'grass',
-            predef: (function(){
-                var end = [4,0,'roady-base'];
-                var a = [
-                    [1,5,'roady-base'],
-                    end,
-                    [1,1,'building'],
-                ];
-                addRow(a, 4, 6, 'sand');
-                addRow(a, 5, 6, 'water');
-                a.push(end); // double up, addBeach overwrote this
-                a.push([4,5,'palm']);
-                a.push([4,4,'palm']);
-                return a;
-            })(),
-        },
-        { // 5
-            seed: 100,
-            w:6,
-            h:6,
-            wMod:4,
-            base: 'grass',
-            predef: (function(){
-                var a = [
-                    [1,5,roadBase],
-                    [1,0,roadBase],
-                    [0,5,forest],
-                ];
-                addRow(a, 4, 6, 'sand');
-                addRow(a, 5, 6, 'water');
-                addCol(a, 3, 6, 'water');
-                a.push([3,3,'broady']);
-                a.push([4,0,'palm']);
-                return a;
-            })(),
-        },
-        { // 6
-            seed: 301,
-            w:7,
-            h:7,
-            wMod: 4,
-            base: 'sand',
-            predef: (function(){
-                var a = [
-                    [5,6,roadBase],
-                    [0,2,'roadx'],
-                    [4,1,'palm'],
-                    [0,3,'building'],
-                    [5,2,'helipad'],
-                    [5,1,water],
-                ];
-                addRow(a, 6, 7, 'water');
-                addCol(a, 0, 7, 'water');
-                return a;
-            })(),
-        },
-        { // 7
-            seed: 400,
-            w:7,
-            h:7,
-            wMod: 4,
-            base:'grass',
-            predef: (function(){
-                var a = [
-                    [6,2,'roadx-base'],
-                    [0,4,'roadx-base'],
-                    [6,1,'sand'],
-                    [6,0,water],
-                    [5,1,'sand'],
-                    [5,0,water],
-                    [4,0,water],
-                    [4,1,'sand'],
-                    [3,0,'sand'],
-                    [3,1,'sand'],
-                ];
-                return a;
-            })(),
-        }
     ]
 };
 
@@ -231,62 +312,121 @@ var levels = {
 // 2.45 after combining predef array
 //
 var spriteIndex = Object.keys(SpriteLib.sprites);
-function enc(num){
-    return String.fromCharCode(num+48);
+var emergency = 0;
+
+/**
+ * Pad a number with the specified number zeroes.
+ */
+function pad(str, num){
+    str = String(str);
+    while(str.length < num){
+        str = '0' + str;
+    }
+    return str;
 }
+
+/**
+ * Encode a string using a custom base36 encoding.
+ * * Strings are chunked into 8 byte base36 encoded pieces for integer safety.
+ * * The final piece may not make up 8 bytes, this is piecked up by the decoder..
+ * @param {string} num  string full of numeric digits to encode.
+ * @return {string}     base36/alphanumeric encoded string.
+ */
+ function enc(num){
+     // Stringify our number in case it was input as an integer.
+     num = String(num);
+
+     // Keep track of our encoded chunks.
+     var encodedChunks = [];
+
+     // Continue until we've processed the entire string.
+     while(num.length){
+         // Start somewhere.
+         var splitPosition = 7;
+
+         // Try incrementally larger pieces until we get one that's exectly
+         // 8 characters long.
+         var encodedNum = '';
+         do {
+             // toString(36) converts decimal to base36.
+             // Add a leading 1 for safety, as any leading zeroes would otherwise
+             // be lost.
+             encodedNum = Number('1' + num.substr(0, ++splitPosition)).toString(36);
+         } while(encodedNum.length < 8 && splitPosition < num.length && splitPosition < 15);
+
+         // Push our chunk onto the list of encoded chunks and remove these
+         // digits from our string.
+         encodedChunks.push(encodedNum);
+         num = num.substr(splitPosition);
+     }
+
+     // Return a big ol' string.
+     return encodedChunks.join('');
+ };
+
+
+/**
+ * Custom base36 decoder.
+ * @param {string} input    base36/alphanumeric encoded string from the enc function
+ * @return {string}         Original numeric string as passed to the enc function.
+ */
+function dec(input){
+    // Split our string into chunks of 8 bytes (with whatever left over at the end)
+    return input.match(/.{8}|.+/g).map(function(chunk){
+        // Convert each chunk to base 10.
+        return parseInt(chunk, 36);
+    }).join('');
+}
+
+var before = 0;
+var after = 0;
 
 Object.keys(levels).forEach(function(key){
     levels[key] = levels[key].map(function(level, levelId){
 
-        // Remove duplicates.
-        // * Keep only the latest instance of
-        var exists = {};
-        for(var i=level.predef.length-1; i>1; i--){
-            var tile = level.predef[i];
-            if(
-                i > 1 &&
-                (tile[0] !== level.predef[0][0] || tile[1] !== level.predef[0][1]) &&
-                (tile[0] !== level.predef[1][0] || tile[1] !== level.predef[1][1])
-            ){
-                exists[tile[0]+'-'+tile[1]] = tile;
-            } else {
-                if(i>1){
-                    console.log('skipping duplicate tile', tile, exists[tile[0]+'-'+tile[1]]);
-                }
-            }
-        }
-        var existsArr = Object.keys(exists).map(function(key){
-            return exists[key];
-        });
-
-        existsArr.unshift(level.predef[1]);
-        existsArr.unshift(level.predef[0]);
-
-        console.log('Saved ',(level.predef.length - existsArr.length) * 3,'bytes');
-
-        level.predef = existsArr;
-
         // Flatten
         level.predef = level.predef.map(function(predef){
             var index = spriteIndex.indexOf(predef[2]);
-            predef[2] = enc(index);
+            if(index == -1){
+                return predef.join('');
+            }
+            predef[2] = pad(index, 2);
             return predef.join('');
         }).join('');
 
+        // Encoded payload 1.
+        var payload = [
+            level.seed,                             // 0
+            level.w,                                // 1
+            level.h,                                // 2
+            level.wMod || level.w,                  // 3
+            pad(spriteIndex.indexOf(level.base), 2),// 4
+            level.strict ? 1 : 0,                   // 5
+        ].join('');
+
+        var dist = 0;
+        if(level.dist){
+            // Map them back to integers if they're defined as strings.
+            dist = level.dist.map(function(tile){
+                if(typeof tile === 'string'){
+                    tile = spriteIndex.indexOf(tile);
+                }
+                return tile;
+            }).join('');
+        }
+
         var entry = [
             [
-                level.seed,
+                enc(payload),
                 '-',
-                level.w,
-                level.h,
-                level.wMod || level.w,
-                enc(spriteIndex.indexOf(level.base)),
-                level.strict ? 1 : 0,
-                level.dist ? level.dist.join('') : 0,
+                enc(dist),
                 '-',
-                level.predef,
+                enc(level.predef),
             ].join('')
         ];
+
+        before += (payload.length + (dist.length || 0) + level.predef.length);
+        after += (enc(payload).length + (enc(dist).length || 0) + enc(level.predef).length);
         if(level.intro){
             entry.push(level.intro);
         }
@@ -294,5 +434,8 @@ Object.keys(levels).forEach(function(key){
     });
 });
 console.log(JSON.stringify(levels));
+console.log('Before: ', before ,'bytes');
+console.log('After:  ', after ,'bytes');
+console.log('Diff:   ', (after-before) ,'bytes');
 
 module.exports = levels;

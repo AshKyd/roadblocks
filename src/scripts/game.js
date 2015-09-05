@@ -75,6 +75,7 @@ function Game(opts){
         ok:1,
         notok:1,
         dump:1,
+        forest: 1,
     };
 
     // Resize handler. Sets sizing when viewport changes.
@@ -169,6 +170,14 @@ function Game(opts){
     // Fill in any predefined tiles in this level.
     opts.predef.forEach(function(theseOpts){
         map[theseOpts[0]][theseOpts[1]] = theseOpts[2];
+    });
+
+    Object.keys(sprites).forEach(function(key, i){
+        cacheSprite(key);
+        var img = d.createElement('img');
+        img.src = spriteCache[key].c.toDataURL();
+        img.title = i + ' - ' + key;
+        d.body.appendChild(img);
     });
 
     // Touch & movement states

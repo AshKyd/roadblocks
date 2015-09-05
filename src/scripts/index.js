@@ -70,7 +70,7 @@ d.body.onclick = function(e){
 };
 
 function loadGame(gameType, levelId){
-    document.body.className = '';
+    d.body.className = '';
     thisGameType = gameType;
     thisLevelId = levelId;
     levelId = Number(levelId);
@@ -112,7 +112,7 @@ function loadGame(gameType, levelId){
 function showMenu(){
     logo(canvas,ctx,0,1);
     d.body.className = 'menu';
-    d.querySelector('#menu').innerHTML = ['Puzzle', 'Casual', 'Free map'].map(function(text){
+    d.querySelector('#menu').innerHTML = ['Puzzle', 'Free map'].map(function(text){
         var dac = ' data-action="'+text+'"';
         return '<div'+dac+'><img'+dac+' src="'+drawTile('grass', canvas.width/5)+'">'+text+'</div>';
     }).join('');

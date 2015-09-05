@@ -33,6 +33,7 @@ var levels = {
                 [2,0,roadBase],
                 [1,2,forest],
             ],
+            name: 'Roads 101',
             intro: ['Connect from left to right by dragging tiles from the top.', 'Left to right', roadBase],
         },
         { // introduction to intersections 1
@@ -48,6 +49,7 @@ var levels = {
                 [2,3,forest],
                 [2,2,forest],
             ],
+            name: 'Town planning',
             intro: ['Now you\'ve got the hang of it, give it a go with all the tiles.', 'Your turn', 'roadx'],
         },
         { // intro to helipads 2
@@ -62,6 +64,7 @@ var levels = {
                 [3,0,roadBase],
                 [0,0,'helipad'],
             ],
+            name: 'Reverse the flow',
             intro: ['Use the helipad to reverse the order of your tiles.', 'Stack tiles for later', 'helipad']
         },
         { // first open level 3
@@ -83,9 +86,10 @@ var levels = {
                 [2,3,forest],
                 [3,3,forest],
             ],
+            name: 'The Block Forest',
             intro: ['Building road past special tiles like forests or the helipad gives you extra points.', 'Bonus points', 'forest']
         },
-        { // 5
+        { // 4
             seed: 100,
             w:6,
             h:6,
@@ -119,6 +123,7 @@ var levels = {
                 a.push([4,0,'palm']);
                 return a;
             })(),
+            name: 'Bulldozer Beach',
             intro: ['Long press to bulldoze a tile you no longer need.', 'Bulldoze', 'dump'],
         },
         {
@@ -145,6 +150,7 @@ var levels = {
                 a.push([4,3,'broady']);
                 return a;
             })(),
+            name: 'Palm Island',
         },
         {
             seed: 14,
@@ -174,6 +180,7 @@ var levels = {
 
                 return a;
             })(),
+            name: 'Little condo by the sea',
             intro: ['There are several ways to finish this level. See if you can build past the helipad.', 'Many ways', 'sand']
         },
 
@@ -213,6 +220,7 @@ var levels = {
                     a.push([3,5,'helipad']);
                     return a;
                 })(),
+                name: 'Loopy Lagoon',
             },
             { // 6
                 seed: 301,
@@ -256,6 +264,7 @@ var levels = {
                     addCol(a, 0, 7, 'water');
                     return a;
                 })(),
+                name: 'Mini Monaco',
             },
             { // 7
                 seed: 400,
@@ -301,6 +310,7 @@ var levels = {
                     ];
                     return a;
                 })(),
+                name: 'Dual Carriageway'
             }
     ],
     Casual: [
@@ -421,6 +431,8 @@ Object.keys(levels).forEach(function(key){
                 '-',
                 enc(dist),
                 '-',
+                level.name,
+                '-',
                 enc(level.predef),
             ].join('')
         ];
@@ -434,8 +446,4 @@ Object.keys(levels).forEach(function(key){
     });
 });
 console.log(JSON.stringify(levels));
-console.log('Before: ', before ,'bytes');
-console.log('After:  ', after ,'bytes');
-console.log('Diff:   ', (after-before) ,'bytes');
-
 module.exports = levels;

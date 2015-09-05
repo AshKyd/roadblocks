@@ -9,6 +9,7 @@ var jsonStringify = JSON.stringify;
 var random = require('./random');
 var touchList = require('./touchlist');
 var jsonStringify = JSON.stringify;
+var modal = require('./modal');
 
 var colorInterface = '#55bbff';
 var ingameclass = 'ingame';
@@ -36,10 +37,6 @@ function crawlMap(map, w, h, fn){
  */
 var getIsometricPos = require('./getisometricpos');
 
-
-function getElementHeight(ele){
-    return parseInt(w.getComputedStyle(ele, null).getPropertyValue("height"));
-}
 /**
  * Get the position (in isometric coordinates) from a pixel x,y
  */
@@ -459,47 +456,8 @@ function Game(opts){
         }, 500);
     }
 
-    /**
-     * Show/hide the tooltip over the top of the game.
-     */
     function showTooltip(message, title, tile, cb){
-        var tooltip = document.querySelector('#tt');
-        var scrim = document.querySelector('#s');
-        title = title ? '<h1>'+title+'</h1>' : '';
-        tile = tile ? '<img class="rubberBand" src="'+spriteCache[tile].c.toDataURL()+'">' : '';
-        tooltip.innerHTML = '<div id="tt-inner"><a class="close">OK</a> '+title+message+tile+'</div>';
-        tooltip.style.display = 'block';
-        scrim.style.display = 'block';
-
-        // Copyfit the text to fit the dialog, regardless of screen size.
-        var height = getElementHeight(tooltip);
-        var inner = d.querySelector('#tt-inner');
-        var img = d.querySelector('#tt-inner img');
-        for(var i=35; i>10; i--){
-            inner.style.fontSize = i+'px';
-            if(getElementHeight(inner) < height - 80){
-                break;
-            }
-        }
-
-        tooltip.onclick = function(e){
-            e.preventDefault();
-            d.body.className = ingameclass;
-            playSound('select');
-            setTimeout(function(){
-                tooltip.style.display = 'none';
-                scrim.style.display = 'none';
-            },150);
-            if(cb){
-                cb();
-            }
-        };
-        scrim.onclick = tooltip.onclick;
-        tooltip.ontouchstart = tooltip.onclick;
-        d.body.className = ingameclass+' tt';
-        setTimeout(function(){
-            playSound('dialog');
-        },10);
+        modal.show(message, title, spriteCache[tile].c.toDataURL(), cb);
     }
     _this.tt = showTooltip;
 

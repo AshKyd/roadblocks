@@ -42,6 +42,12 @@ html{
     padding:10px 30px;
 }
 
+#tt-inner.scroll{
+    overflow:auto;
+    font-size:25px !important;
+    max-height:85%;
+}
+
 .close{
     position:absolute;
     bottom:20px;
@@ -150,9 +156,6 @@ html{
     color:white;
     border-radius:2px;
     cursor:pointer;
-}
-#b a:hover{
-    background:rgba(255,255,255,.2);
 }
 
 /* points */
@@ -316,12 +319,15 @@ body.menu #menu{
 
 #menu > div{
     padding:10px 20px;
-    margin:10px;
+    margin:10px 15px;
     display:inline-block;
     cursor: pointer;
     border-radius: 2px;
 }
-#menu > div:hover{
+
+#menu > div:hover,
+.pill.active:hover,
+#b a:hover{
     background: #55bbff;
     transform:scale(1.1);
 }
@@ -330,4 +336,49 @@ body.menu #menu{
     display:block;
     margin:0 0 10px;
     padding:0;
+}
+
+.pill{
+    display:block;
+    border-radius: 5px;
+    color:#ddd;
+    background:#ACB2B7;
+    padding:0.5em;
+    margin:0.5em 0;
+    cursor:pointer;
+}
+
+.pill.active{
+    background:#3184C7;
+    color:white;
+}
+
+#tl{
+    position:absolute;
+    right:0;
+    top:0;
+    bottom:0;
+    width:10%;
+    max-width:128px;
+    background: #55bbff;
+    border-left: 1px solid white;
+    transform:translateX(110%);
+    overflow-y:auto;
+}
+#tl.active{
+    transform:translateX(0);
+}
+#tl img{
+    width:90%;
+    display:block;
+    margin:0 5%;
+    border-radius: 5px;
+    cursor:pointer;
+}
+#tl img:hover{
+    transform:scale(1.1);
+}
+#tl img.active{
+    transform:scale(1.1);
+    background:white;
 }

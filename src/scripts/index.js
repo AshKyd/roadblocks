@@ -5,11 +5,12 @@ var canvas = d.querySelector('canvas');
 canvas.width = innerWidth;
 canvas.height = innerHeight;
 var ctx = canvas.getContext('2d');
-var tooltip = d.querySelector('#tt');
 var points = d.querySelector('#p');
 var levels = require('./l');
+var SpriteLib = require('./sprites');
 var logo = require('./logo');
 var playSound = require('./sfx');
+var modal = require('./modal');
 
 /**
  * Fire up a game and render one single tile as specified.
@@ -22,6 +23,7 @@ function drawTile(tile, size){
         tileSize: size,
         w:1,
         h:1,
+        wMod: 1.3,
         canvas: drawTileCanvas,
         base: tile,
         predef: [],
@@ -39,7 +41,6 @@ var actions = {
         thisGame.destroy(function(){
             loadGame(thisGameType, thisLevelId);
         });
-
     },
     menu: function(){
         if(thisGame){
@@ -49,37 +50,74 @@ var actions = {
         }
     },
     Puzzle: function(){
-        loadGame('Puzzle', 0);
+        modal.show(
+            levels.Puzzle.map(function(level, i){
+                var unlocked = (!i || localStorage['Puzzle'+i]);
+                return '<a class="pill '+
+                (unlocked ? 'active' : '') +
+                '" data-action="'+(unlocked ? 'l' : '')+'" data-l="'+i+'">'+(i+1)+'. '+level.name+'</a>';
+            }).join(''),
+            'Puzzle play',
+            null,
+            0
+        );
     },
-    Casual: function(){
-        loadGame('Casual', 0);
+    'Free map': function(){
+        var tileList = d.querySelector('#tl');
+        tileList.innerHTML = SpriteLib.placeable.map(function(sprite){
+            return '<img id="t'+sprite+'" src="'+drawTile(sprite, 128)+'" data-action="p" data-s="'+sprite+'">';
+        }).join('');
+        tileList.className = 'active';
+        loadGame('Free', 0);
     },
-    Free: function(){
+
+    // Load puzzle game
+    l: function(data){
+        modal.hide(function(){
+            loadGame('Puzzle', data.l);
+        });
+    },
+
+    // place tile
+    p: function(data){
+        var prevActive = d.querySelector('#tl .active');
+        if(prevActive){
+            prevActive.className = '';
+        }
+        var thisActive = d.querySelector('#t'+data.s);
+        thisActive.className = 'active';
+        thisGame.setTile(data.s, function(){
+            console.log('tile deselected');
+            thisActive.className = '';
+        });
 
     }
 };
 
 d.body.onclick = function(e){
-    var action = e.target.dataset.action;
-    if(actions[action]){
-        actions[action]();
+    var data = e.target.dataset;
+    if(actions[data.action]){
+        actions[data.action](data);
+        return false;
     }
-    if(thisGame[action]){
-        thisGame[action]();
+    if(thisGame[data.action]){
+        thisGame[data.action](data);
+        return false;
     }
 };
 
 function loadGame(gameType, levelId){
     d.body.className = '';
     thisGameType = gameType;
-    thisLevelId = levelId;
     levelId = Number(levelId);
+    thisLevelId = levelId;
     var level = levels[gameType][levelId];
     if(!level){
         if(thisGame){
-            thisGame.tt(
+            modal.show(
                 "Congratulations, you've finished all the levels. Be sure to share this game with your friends!",
                 'You won!',
+                0,
                 0,
                 showMenu
             );
@@ -92,17 +130,20 @@ function loadGame(gameType, levelId){
 
     level.canvas = canvas;
     level.points = 0;
+    level.gameType = gameType;
 
     level.onwin = function(){
         thisGame.destroy();
         loadGame(gameType, levelId+1);
         w.location.hash = gameType+'-'+(levelId+1);
+        localStorage[gameType+(levelId+1)] = 1;
     };
 
     level.onlose = function(){
         thisGame.destroy(function(){
-            thisGame.tt.apply(thisGame, ['Look like you got stuck. Tap to try again.', 'Level failed']);
-            loadGame(gameType, levelId);
+            modal.show('Looks like you got stuck. Tap to try again.', 'Level failed', null, 1, function(){
+                loadGame(gameType, levelId);
+            });
         });
     };
 
@@ -112,9 +153,9 @@ function loadGame(gameType, levelId){
 function showMenu(){
     logo(canvas,ctx,0,1);
     d.body.className = 'menu';
-    d.querySelector('#menu').innerHTML = ['Puzzle', 'Free map'].map(function(text){
-        var dac = ' data-action="'+text+'"';
-        return '<div'+dac+'><img'+dac+' src="'+drawTile('grass', canvas.width/5)+'">'+text+'</div>';
+    d.querySelector('#menu').innerHTML = [['Puzzle','roadx-base'], ['Free map','dump']].map(function(text){
+        var dac = ' data-action="'+text[0]+'"';
+        return '<div'+dac+'><img'+dac+' src="'+drawTile(text[1], canvas.width/5)+'">'+text[0]+'</div>';
     }).join('');
     playSound('dialog');
 }

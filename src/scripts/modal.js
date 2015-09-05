@@ -10,46 +10,55 @@ var tooltip = document.querySelector('#tt');
 var scrim = document.querySelector('#s');
 
 module.exports = {
-    show: function(message, title, tile, cb){
+    show: function(message, title, tile, copyfit, cb){
         title = title ? '<h1>'+title+'</h1>' : '';
         tile = tile ? '<img class="rubberBand" src="'+tile+'">' : '';
         tooltip.innerHTML = '<div id="tt-inner"><a class="close">OK</a> '+title+message+tile+'</div>';
         tooltip.style.display = 'block';
         scrim.style.display = 'block';
-        tooltip.className = 'active';
-        scrim.className = 'active';
+        setTimeout(function(){
+            tooltip.className = 'active';
+            scrim.className = 'active';
+        }, 1);
 
         // Copyfit the text to fit the dialog, regardless of screen size.
         var height = getElementHeight(tooltip);
         var inner = d.querySelector('#tt-inner');
         var img = d.querySelector('#tt-inner img');
-        for(var i=35; i>10; i--){
-            inner.style.fontSize = i+'px';
-            if(getElementHeight(inner) < height - 80){
-                break;
+
+        if(copyfit){
+            inner.className = '';
+            for(var i=35; i>10; i--){
+                inner.style.fontSize = i+'px';
+                if(getElementHeight(inner) < height - 80){
+                    break;
+                }
             }
+        } else {
+            inner.className = 'scroll';
         }
 
-        tooltip.onclick = function(e){
+        function close(e){
             e.preventDefault();
             playSound('select');
-            tooltip.className = '';
-            scrim.className = '';
-            setTimeout(function(){
-                module.exports.hide();
-            },150);
-            if(cb){
-                cb();
-            }
-        };
-        scrim.onclick = tooltip.onclick;
+            module.exports.hide(cb);
+        }
+        document.querySelector('.close').onclick = close;
+        scrim.onclick = close;
         tooltip.ontouchstart = tooltip.onclick;
         setTimeout(function(){
             playSound('dialog');
         },10);
     },
-    hide: function(){
-        tooltip.style.display = 'none';
-        scrim.style.display = 'none';
+    hide: function(cb){
+        tooltip.className = '';
+        scrim.className = '';
+        setTimeout(function(){
+            tooltip.style.display = 'none';
+            scrim.style.display = 'none';
+            if(cb){
+                cb();
+            }
+        }, 150);
     },
 };

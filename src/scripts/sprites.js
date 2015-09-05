@@ -372,7 +372,14 @@ var tileLogic = {
         title: 'Buildings',
         firstrun: "Place buildings alongside roads for extra points.",
         points: 100
-    }
+    },
+    dump: 1,
+    helipad: 1,
+    water: 1,
+    sand: 1,
+    palm: 1,
+    broadx: 1,
+    broady: 1,
 };
 
 // Get a list of placeables
@@ -399,6 +406,7 @@ var animated = {
     tree: 1,
     elk: 1,
     palm: 1,
+    dump: 1,
 };
 
 module.exports = {

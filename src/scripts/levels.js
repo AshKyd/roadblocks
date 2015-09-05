@@ -313,7 +313,16 @@ var levels = {
                 name: 'Dual Carriageway'
             }
     ],
-    Casual: [
+    Free: [
+        {
+            seed:0,
+            w:7,
+            h:7,
+            wMod: 4,
+            base: 'grass',
+            dist: 0,
+            predef: [],
+        }
     ]
 };
 
@@ -372,7 +381,7 @@ function pad(str, num){
 
      // Return a big ol' string.
      return encodedChunks.join('');
- };
+ }
 
 
 /**
@@ -426,12 +435,11 @@ Object.keys(levels).forEach(function(key){
         }
 
         var entry = [
+            level.name,
             [
                 enc(payload),
                 '-',
                 enc(dist),
-                '-',
-                level.name,
                 '-',
                 enc(level.predef),
             ].join('')

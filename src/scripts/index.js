@@ -156,6 +156,8 @@ function loadGame(gameType, levelId){
 }
 
 function showMenu(){
+    // hide the tile list dialog from free mode
+    d.querySelector('#tl').className = '';
     logo(canvas,ctx,0,1);
     d.body.className = 'menu';
     d.querySelector('#menu').innerHTML = [

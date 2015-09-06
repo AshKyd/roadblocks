@@ -87,7 +87,7 @@ html{
 
 #tt img{
     display:block;
-    margin:-20% auto 0;
+    margin:-15% auto 0;
     padding-bottom:20px;
     max-width:200px;
 }
@@ -115,7 +115,7 @@ html{
     }
 }
 
-@media(max-height:480px){
+@media(max-height:490px) and (orientation: landscape){
     #tt{
         padding-left: 150px;
     }

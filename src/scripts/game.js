@@ -374,9 +374,9 @@ function Game(opts){
     }
 
     function isTouchInTileQueueBounds(touch){
-        return  touch.clientY < tileSize &&
+        return  touch.clientY < tileHalf &&
                 touch.clientX > tileQueueBounds &&
-                touch.clientX < tileQueueBounds + tileSize;
+                touch.clientX < tileQueueBounds + tileHalf;
 
     }
 
@@ -417,7 +417,7 @@ function Game(opts){
     }
 
     function dustCloud(pos){
-        var randomColours = ['#DC6969', '#9EC8A0', colorInterface];
+        var randomColours = ['#aaaaaa', '#cccccc', colorInterface];
         for(var i=0; i<10; i++){
             var xVelocity = Math.random()-0.5;
             var yVelocity = Math.random()-0.5;
@@ -686,7 +686,7 @@ function Game(opts){
         opts.points.innerText = totalPoints + globalPoints;
     }
     function drawPoints(){
-        ctx.font = "bold 16px serif";
+        ctx.font = "bold 25px serif";
         ctx.strokeStyle = '#fff';
         ctx.lineWidth = 5;
         if(visiblePoints.length){

@@ -66,6 +66,7 @@ function Game(opts){
 
     var tileQueueCanvas = d.createElement('canvas');
     var tileQueueContext = tileQueueCanvas.getContext('2d');
+    var tileQueueReset = 0;
 
     // Cache of rendered sprites
     // The preexisting ones will be cached ahead of time so we can use them
@@ -322,6 +323,7 @@ function Game(opts){
                 if(tileSelectType != 1){
                     heliStack.push(selectedTile);
                     tileStack.shift();
+                    tileQueueReset = now;
                 }
             } else if(gameIsFree || canPlaceTileHere(selectedTile, lastHoveredTileCoords)) {
                 if(sprites[selectedTile+'-base']){
@@ -333,6 +335,7 @@ function Game(opts){
                     // calculatePoints(getPixelPosFromTouch(lastTouch,1));
                     // 0 = tileStack, 1 = heliStack.
                     if(tileSelectType === 0){
+                        tileQueueReset = now;
                         tileStack.shift();
                     } else {
                         heliStack.pop();
@@ -933,9 +936,17 @@ function Game(opts){
         return 0 - tileHalf/2 + (queueSize - i - 1)*(tileHalf+spacing);
     }
 
+    var drawTileQueueOffset = 0;
     function drawTileQueue(){
         if(!renderChrome || !showTileQueue){
             return;
+        }
+        if(tileQueueReset){
+            drawTileQueueOffset = (1-(now - tileQueueReset)/200) * (getTileQueuePos(1) - getTileQueuePos(0));
+            if(now > tileQueueReset+200){
+                tileQueueReset = 0;
+                drawTileQueueOffset = 0;
+            }
         }
 
         // Draw the background/outline.
@@ -956,11 +967,12 @@ function Game(opts){
                 continue;
             }
             // Don't render the last one if we're moving it.
-            if(isTouching && selectedTile && tileSelectType === 0 && i === 0){
+            if(selectedTile && tileSelectType === 0 && i === 0){
+
             } else {
                 tileQueueContext.drawImage(
                     spriteCache[tile].c, // cacned canvas tile
-                    getTileQueuePos(i), // x
+                    getTileQueuePos(i) + drawTileQueueOffset, // x
                     0-tileHalf*0.75 - (i===0 ? Math.max(0, Math.sin(now/200))*5 : 1), //y
                     tileHalf, // w
                     tileSize //h
@@ -979,7 +991,15 @@ function Game(opts){
             // Don't draw the last tile if we're currently dragging it.
             // This is too hard to do with array manipulation in touch events.
             if(tileSelectType === 1 && i === heliStack.length-1){
-
+                if(!isTouching){
+                    // If we're not touching, we've clicked. So bounce the tile
+                    // so there's an indicator of what's happening.
+                    ctx.drawImage(
+                        spriteCache[tile].c,
+                        pos[0] - tileSize/2,
+                        pos[1] - tileSize * 1.5 - tileHalf/10*(i+1) - Math.abs(Math.sin(now/200))*5
+                    );
+                }
             } else{
                 ctx.drawImage(
                     spriteCache[tile].c,
@@ -1013,18 +1033,27 @@ function Game(opts){
             if(gameIsFree && selectedTile && lastHoveredTilePos){
                 // Draw our happiness indicator on the map.
                 ctx.drawImage(spriteCache.ok.c, lastHoveredTilePos[0] - tileSize/2 + viewport[0], lastHoveredTilePos[1] - tileSize*1.5 + viewport[1]);
-            } else if(selectedTile && isTouching){
-                // Draw the tile we're dragging right now.
-                ctx.drawImage(
-                    spriteCache[selectedTile].c, // cached canvas tile
-                    lastTouch.clientX - tileSize/2, // x
-                    lastTouch.clientY - tileSize*1.25  - displayOffset
-                );
+            } else if(selectedTile){
+                if(isTouching){
+                    // Draw the tile we're dragging right now.
+                    ctx.drawImage(
+                        spriteCache[selectedTile].c, // cached canvas tile
+                        lastTouch.clientX - tileSize/2, // x
+                        lastTouch.clientY - tileSize*1.25  - displayOffset
+                    );
 
-                // Draw the happiness indicator
-                if(lastHoveredTilePos && map[lastHoveredTileCoords[0]] && map[lastHoveredTileCoords[0]][lastHoveredTileCoords[1]]){
-                    var indicatorTileName = lastHoveredTileType === 'helipad' || canPlaceTileHere(selectedTile, lastHoveredTileCoords) ? 'ok' : 'notok';
-                    ctx.drawImage(spriteCache[indicatorTileName].c, lastHoveredTilePos[0] - tileSize/2 + viewport[0], lastHoveredTilePos[1] - tileSize*1.5 + viewport[1]);
+                    // Draw the happiness indicator
+                    if(lastHoveredTilePos && map[lastHoveredTileCoords[0]] && map[lastHoveredTileCoords[0]][lastHoveredTileCoords[1]]){
+                        var indicatorTileName = lastHoveredTileType === 'helipad' || canPlaceTileHere(selectedTile, lastHoveredTileCoords) ? 'ok' : 'notok';
+                        ctx.drawImage(spriteCache[indicatorTileName].c, lastHoveredTilePos[0] - tileSize/2 + viewport[0], lastHoveredTilePos[1] - tileSize*1.5 + viewport[1]);
+                    }
+                } else {
+                    // We're not dragging, but this tile has been selected.
+                    ctx.drawImage(
+                        spriteCache[selectedTile].c, // cached canvas tile
+                        getTileQueuePos(0), // x
+                        0 - tileSize
+                    );
                 }
             }
             drawPoints();

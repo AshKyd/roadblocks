@@ -223,14 +223,12 @@ function Game(opts){
         lastHoveredTileType = getTileFromTouch(touch);
         lastHoveredTilePos = getIsometricPos(lastHoveredTileCoords[0], lastHoveredTileCoords[1], tileSize);
 
+        if(selectedTile){
+            return;
+        }
 
         // Check if we're dragging the last tile off the queue.
-        if(
-            !gameIsFree &&
-            touch.clientY < tileSize &&
-            touch.clientX > tileQueueBounds &&
-            touch.clientX < tileQueueBounds + tileSize
-        ){
+        if(!gameIsFree && isTouchInTileQueueBounds(touch)){
             selectedTile = tileStack[0];
             playSound('select');
             tileSelectType = 0;
@@ -293,7 +291,6 @@ function Game(opts){
         if(!gameIsFree && !isTouching){
             return;
         }
-        console.log('free,touching', selectedTile, isTouching);
         e.preventDefault();
         moves++;
         var touch = touchList(e);
@@ -312,7 +309,13 @@ function Game(opts){
         isTouching=0;
         clearTimeout(longPress);
         if(selectedTile){
-            if(lastHoveredTileType === 'helipad'){
+            if(
+                isTouchInTileQueueBounds(lastTouch) || // If we're dropping on the queue
+                (tileSelectType===1 && lastHoveredTileType === 'helipad') // Or if we picked up & dropped on the helipad
+            ){
+                // Do nothing. Assume the user wants to drop the tile later.
+                return;
+            } else if(lastHoveredTileType === 'helipad'){
                 playSound('place');
                 // If we pulled this tile off the helipad then put it back on,
                 // don't shift off the main stack.
@@ -326,6 +329,7 @@ function Game(opts){
                 }
                 if(setTileFromTouch(lastTouch, selectedTile)){
                     playSound('place');
+                    explode(getPixelPosFromTouch(lastTouch, selectedTile), '#aaaaaa', 1, 0.25);
                     // calculatePoints(getPixelPosFromTouch(lastTouch,1));
                     // 0 = tileStack, 1 = heliStack.
                     if(tileSelectType === 0){
@@ -354,6 +358,13 @@ function Game(opts){
         }
     }
 
+    function isTouchInTileQueueBounds(touch){
+        return  touch.clientY < tileSize &&
+                touch.clientX > tileQueueBounds &&
+                touch.clientX < tileQueueBounds + tileSize;
+
+    }
+
     var events = [
         ['resize', resize, window],
         ['touchstart', touchstart],
@@ -372,7 +383,7 @@ function Game(opts){
 
     var particles = [];
     var particleSize = tileSize/30;
-    function explode(pos, color){
+    function explode(pos, color, disableGravity, startAlpha){
         for(var i=0; i<8; i++){
             particles.push([
                 now,
@@ -382,7 +393,9 @@ function Game(opts){
                 Math.random()*2-1,
                 1.5,
                 500,
-                color || '#C8AF9E'
+                color || '#C8AF9E',
+                !disableGravity,
+                startAlpha || 1
             ]);
         }
     }
@@ -393,7 +406,7 @@ function Game(opts){
                 var diff = (now - p[0])/(p[6]);
                 var x = p[1] + p[3] * diff;
                 var y = p[2] + p[4] * diff;
-                var z = (p[5]*tileHalf*diff)*(1-diff*diff);
+                var z = (p[5]*tileHalf*diff)* (p[8] ? (1-diff*diff) : 1);
                 var pos = getIsometricPos(x, y, tileSize);
                 // ctx.fillRect(pos[0] + viewport[0], pos[1] + viewport[1], 5, 5);
                 drawCube(ctx,
@@ -403,7 +416,7 @@ function Game(opts){
                     particleSize,
                     particleSize,
                     p[7],
-                    diff > 0.5 ? 1 - (diff-0.5)*2 : 1
+                    diff > 0.5 ? p[9] - (diff-0.5)*2 : p[9]
                 );
                 // drawCube(ctx,
                 //     pos[0] + viewport[0],
@@ -924,6 +937,8 @@ function Game(opts){
         if(!renderChrome || !showTileQueue){
             return;
         }
+
+        // Draw the background/outline.
         for(var i=1; i>-1; i--){
             tileQueueContext.fillStyle = i === 0 ? colorInterface : '#fff';
             tileQueueContext.fillRect(
@@ -934,7 +949,7 @@ function Game(opts){
             );
         }
 
-
+        // Draw the tiles themselves.
         for(i=0; i<queueSize; i++){
             var tile = tileStack[i];
             if(typeof tile === 'undefined'){
@@ -946,7 +961,7 @@ function Game(opts){
                 tileQueueContext.drawImage(
                     spriteCache[tile].c, // cacned canvas tile
                     getTileQueuePos(i), // x
-                    0-tileHalf*0.75, //y
+                    0-tileHalf*0.75 - (i===0 ? Math.max(0, Math.sin(now/200))*5 : 1), //y
                     tileHalf, // w
                     tileSize //h
                 );

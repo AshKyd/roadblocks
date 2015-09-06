@@ -217,10 +217,16 @@ function Game(opts){
         }
         lastTouch = touch;
         touchStartSpot = touch.clientX + touch.clientY;
+        moves = 0;
+
+        lastHoveredTileCoords = getPixelPosFromTouch(touch);
+        lastHoveredTileType = getTileFromTouch(touch);
+        lastHoveredTilePos = getIsometricPos(lastHoveredTileCoords[0], lastHoveredTileCoords[1], tileSize);
+
 
         // Check if we're dragging the last tile off the queue.
         if(
-            gameIsFree &&
+            !gameIsFree &&
             touch.clientY < tileSize &&
             touch.clientX > tileQueueBounds &&
             touch.clientX < tileQueueBounds + tileSize
@@ -228,13 +234,8 @@ function Game(opts){
             selectedTile = tileStack[0];
             playSound('select');
             tileSelectType = 0;
+            return;
         }
-
-        moves = 0;
-        lastHoveredTileCoords = getPixelPosFromTouch(touch);
-        lastHoveredTileType = getTileFromTouch(touch);
-        lastHoveredTilePos = getIsometricPos(lastHoveredTileCoords[0], lastHoveredTileCoords[1], tileSize);
-
         // Do this before we do our fat finger munging.
         var tileundertouch = getTileFromTouch(touch, 0);
 
@@ -265,8 +266,8 @@ function Game(opts){
                     var tile = getPixelPosFromTouch(touch);
                     var tileType = getTileFromTouch(touch);
                     var predefs = opts.predef.filter(function(item){
+                        // Skipping this tile
                         if(item[2] === opts.base){
-                            console.log('skipping this tile');
                             return false;
                         }
                         if(tile[0] === item[0] && tile[1] === item[1]){
@@ -292,6 +293,7 @@ function Game(opts){
         if(!gameIsFree && !isTouching){
             return;
         }
+        console.log('free,touching', selectedTile, isTouching);
         e.preventDefault();
         moves++;
         var touch = touchList(e);

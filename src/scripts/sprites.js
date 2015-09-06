@@ -245,19 +245,21 @@ var sprites =  {
         a.push([height,-.05+pos,-.15,.02,.15,.02,greenTree]);
         return a;
     },
-    car: function(){
-        var sin = Math.sin(new Date() / 25)+1;
-        var startHeight = sin/200 + 0.05;
-        var color = '#A47BAF';
-        var a = [
-            [0, -.11, -0.14, .1, .1, .1, '#222222'],
-            [0, -.11, 0.08, .1, .1, .1, '#222222'],
-            [startHeight, -0.13, -0.2, 0.26, 0.4, 0.1, color],
-            [startHeight+0.1, -0.13, -0.13, 0.26, 0.26, 0.1, glass],
-            [startHeight+0.2, -0.13, -0.13, 0.26, 0.26, 0.01, color],
-        ];
-        return a;
-    },
+
+    // Aw, car! You'll be missed.
+    // car: function(){
+    //     var sin = Math.sin(new Date() / 25)+1;
+    //     var startHeight = sin/200 + 0.05;
+    //     var color = '#A47BAF';
+    //     var a = [
+    //         [0, -.11, -0.14, .1, .1, .1, '#222222'],
+    //         [0, -.11, 0.08, .1, .1, .1, '#222222'],
+    //         [startHeight, -0.13, -0.2, 0.26, 0.4, 0.1, color],
+    //         [startHeight+0.1, -0.13, -0.13, 0.26, 0.26, 0.1, glass],
+    //         [startHeight+0.2, -0.13, -0.13, 0.26, 0.26, 0.01, color],
+    //     ];
+    //     return a;
+    // },
     elk: function(){
         var sin = Math.sin(new Date()/1000);
         var headHeight = sin > 0 ? 0.05 : 0.15;

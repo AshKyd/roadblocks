@@ -11,8 +11,8 @@ var SpriteLib = require('./sprites');
 var logo = require('./logo');
 var playSound = require('./sfx');
 var modal = require('./modal');
-
 var Storage = require('./storage');
+var tileList = d.querySelector('#tl');
 
 /**
  * Fire up a game and render one single tile as specified.
@@ -65,12 +65,15 @@ var actions = {
         );
     },
     'Free map': function(){
-        var tileList = d.querySelector('#tl');
-        tileList.innerHTML = SpriteLib.placeable.map(function(sprite){
-            return '<img id="t'+sprite+'" src="'+drawTile(sprite, 128)+'" data-action="p" data-s="'+sprite+'">';
-        }).join('');
-        tileList.className = 'active';
-        loadGame('Free', 0);
+        if(!Storage.state.Puzzle5){
+            modal.show('Unlock this mode by completing more puzzles.', 'Mode locked');
+        } else {
+            tileList.innerHTML = SpriteLib.placeable.map(function(sprite){
+                return '<img id="t'+sprite+'" src="'+drawTile(sprite, 128)+'" data-action="p" data-s="'+sprite+'">';
+            }).join('');
+            tileList.className = 'active';
+            loadGame('Free', 0);
+        }
     },
     Exit: function(){
         window.close();
@@ -157,7 +160,7 @@ function loadGame(gameType, levelId){
 
 function showMenu(){
     // hide the tile list dialog from free mode
-    d.querySelector('#tl').className = '';
+    tileList.className = '';
     logo(canvas,ctx,0,1);
     d.body.className = 'menu';
     d.querySelector('#menu').innerHTML = [

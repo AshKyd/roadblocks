@@ -52,6 +52,7 @@ Object.keys(levels).map(function(levelType){
             dist: data[1] === '0' ? 0 : data[1].split('').map(numberise),
             predef : predef,
             intro: level[2],
+            outro: level[3],
             name: level[0],
         };
     });

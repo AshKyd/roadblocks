@@ -12,6 +12,8 @@ var logo = require('./logo');
 var playSound = require('./sfx');
 var modal = require('./modal');
 
+var Storage = require('./storage');
+
 /**
  * Fire up a game and render one single tile as specified.
  */
@@ -52,7 +54,7 @@ var actions = {
     Puzzle: function(){
         modal.show(
             levels.Puzzle.map(function(level, i){
-                var unlocked = (!i || localStorage['Puzzle'+i]);
+                var unlocked = (!i || Storage.state['Puzzle'+i]);
                 return '<a class="pill '+
                 (unlocked ? 'active' : '') +
                 '" data-action="'+(unlocked ? 'l' : '')+'" data-l="'+i+'">'+(i+1)+'. '+level.name+'</a>';
@@ -69,6 +71,9 @@ var actions = {
         }).join('');
         tileList.className = 'active';
         loadGame('Free', 0);
+    },
+    Exit: function(){
+        window.close();
     },
 
     // Load puzzle game
@@ -136,7 +141,7 @@ function loadGame(gameType, levelId){
         thisGame.destroy();
         loadGame(gameType, levelId+1);
         w.location.hash = gameType+'-'+(levelId+1);
-        localStorage[gameType+(levelId+1)] = 1;
+        Storage.set(gameType+(levelId+1),  1);
     };
 
     level.onlose = function(){
@@ -153,7 +158,11 @@ function loadGame(gameType, levelId){
 function showMenu(){
     logo(canvas,ctx,0,1);
     d.body.className = 'menu';
-    d.querySelector('#menu').innerHTML = [['Puzzle','roadx-base'], ['Free map','dump']].map(function(text){
+    d.querySelector('#menu').innerHTML = [
+        ['Puzzle','roadx-base'],
+        ['Free map','dump'],
+        ['Exit','grass'], // Only useful for app modes.
+    ].map(function(text){
         var dac = ' data-action="'+text[0]+'"';
         return '<div'+dac+'><img'+dac+' src="'+drawTile(text[1], canvas.width/5)+'">'+text[0]+'</div>';
     }).join('');

@@ -32,7 +32,7 @@
     "stats.js": "~1.0.0"
   },
   "scripts": {
-    "clean": "rm dist/* -rf;mkdir -p dist;",
+    "clean": "rm dist chrome chrome.zip dist.zip -rf;mkdir -p dist;",
     "encode-levels": "node src/scripts/levels.js > src/scripts/.levels.json",
     "browserify": "browserify src/scripts/index.js | uglifyjs --screw-ie8 -mc > dist/index.js",
     "copy": "cp src/index.html dist/ -r",
@@ -41,6 +41,7 @@
     "build": "npm run copy & npm run css & npm run encode-levels; wait; npm run browserify; npm run zip",
     "deploy": "npm run clean; npm run build;rsync -avz dist/* direct.ash.ms:/var/www/ash.ms/public_html/js13k2k15/",
     "server": "mkdir -p dist; cd dist; beefy ../src/scripts/index.js:index.js",
-    "watch": "npm run server & node node_modules/watch/cli.js 'npm run build' src --ignoreDotFiles"
+    "watch": "npm run server & node node_modules/watch/cli.js 'npm run build' src --ignoreDotFiles",
+    "build-chrome": "npm run clean;npm run build & cp src/chrome/ chrome/ -R;wait;cp dist/* chrome/ -R;cd chrome;zip ../chrome.zip -r *"
   }
 }

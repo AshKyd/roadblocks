@@ -315,7 +315,14 @@ var sprites =  {
             [headHeight/2+0.01,.05,.1,0,.1,.05,yellow],
             [headHeight/4+0.025,.05,.2,0,.1,.05,yellow],
         ]
-    }
+    },
+    forest2: [
+        ['ground',0,0,0],
+        ['grassSurface',0,0,0],
+        ['tree', 0, .3,.8],
+        ['tree', 0, .6,.5],
+        ['tree', 0, .4,.2],
+    ],
 };
 Object.keys(sprites).map(function(spriteName){
     if(spriteName.indexOf('road') === 0){
@@ -365,8 +372,6 @@ var tileLogic = {
                 return true;
             }
         }, // Forests can be placed anywhere.
-        title: 'Forests',
-        firstrun: "Forest tiles can be placed on top of any square on the map, including ones you've already placed.",
         points: 50
     },
     building: {
@@ -382,6 +387,7 @@ var tileLogic = {
     palm: 1,
     broadx: 1,
     broady: 1,
+    forest2: 1,
 };
 
 // Get a list of placeables
@@ -403,6 +409,7 @@ tileLogic.helipad = {
 // Note: doesn't seem to affect render speed that much.
 var animated = {
     forest: 1,
+    forest2: 1,
     sand: 1,
     helipad: 1,
     tree: 1,

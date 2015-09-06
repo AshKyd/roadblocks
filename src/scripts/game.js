@@ -64,8 +64,11 @@ function Game(opts){
     // Tile size helpers
     var tileSize, tileHalf, tileDepth;
 
+    // Tile queue buffer.
     var tileQueueCanvas = d.createElement('canvas');
     var tileQueueContext = tileQueueCanvas.getContext('2d');
+
+    // Set this to `now` to trigger a tileQueue slide-across.
     var tileQueueReset = 0;
 
     // Cache of rendered sprites
@@ -220,11 +223,21 @@ function Game(opts){
         touchStartSpot = touch.clientX + touch.clientY;
         moves = 0;
 
+        // Do this before we do our fat finger munging.
+        var tileundertouch = getTileFromTouch(touch, 0);
+
         lastHoveredTileCoords = getPixelPosFromTouch(touch);
         lastHoveredTileType = getTileFromTouch(touch);
         lastHoveredTilePos = getIsometricPos(lastHoveredTileCoords[0], lastHoveredTileCoords[1], tileSize);
 
         if(selectedTile){
+            if(
+                (tileSelectType === 1 && tileundertouch === 'helipad') ||
+                (tileSelectType === 0 && isTouchInTileQueueBounds(touch))
+            ){
+                selectedTile = false;
+                tileSelectType = 0;
+            }
             return;
         }
 
@@ -235,8 +248,6 @@ function Game(opts){
             tileSelectType = 0;
             return;
         }
-        // Do this before we do our fat finger munging.
-        var tileundertouch = getTileFromTouch(touch, 0);
 
         if(!tileundertouch){
             selectedTile = 0;
@@ -276,7 +287,7 @@ function Game(opts){
                     if(tileType && tileType !== opts.base && !predefs.length){
                         setTileFromTouch(touch, opts.base);
                         playSound('boom');
-                        explode(tile);
+                        explode(tile, '#aaaaaa');
                         rumble();
                         globalPoints -= 15;
                         showPoints(tile, -15);
@@ -324,6 +335,7 @@ function Game(opts){
                     heliStack.push(selectedTile);
                     tileStack.shift();
                     tileQueueReset = now;
+                    dustCloud(getPixelPosFromTouch(lastTouch));
                 }
             } else if(gameIsFree || canPlaceTileHere(selectedTile, lastHoveredTileCoords)) {
                 if(sprites[selectedTile+'-base']){
@@ -331,7 +343,7 @@ function Game(opts){
                 }
                 if(setTileFromTouch(lastTouch, selectedTile)){
                     playSound('place');
-                    explode(getPixelPosFromTouch(lastTouch, selectedTile), '#aaaaaa', 1, 0.25);
+                    dustCloud(getPixelPosFromTouch(lastTouch));
                     // calculatePoints(getPixelPosFromTouch(lastTouch,1));
                     // 0 = tileStack, 1 = heliStack.
                     if(tileSelectType === 0){
@@ -386,19 +398,40 @@ function Game(opts){
 
     var particles = [];
     var particleSize = tileSize/30;
-    function explode(pos, color, disableGravity, startAlpha){
+    function explode(pos, color){
         for(var i=0; i<8; i++){
             particles.push([
                 now,
-                pos[0],
-                pos[1],
-                Math.random()*2-1,
-                Math.random()*2-1,
-                1.5,
+                pos[0] - 0.5,
+                pos[1] - 0.5,
+                Math.random()*2-1, // x
+                Math.random()*2-1, // y
+                1.5,               // z
+                displayOffset ? 800 : 500, // touch devices animate for longer
+                                           // because our fingers are in the way
+                color,
+                1, // enable gravity
+                1, // Alpha = 1
+            ]);
+        }
+    }
+
+    function dustCloud(pos){
+        var randomColours = ['#DC6969', '#9EC8A0', colorInterface];
+        for(var i=0; i<10; i++){
+            var xVelocity = Math.random()-0.5;
+            var yVelocity = Math.random()-0.5;
+            particles.push([
+                now,
+                pos[0] - Math.random(),
+                pos[1] - Math.random(),
+                xVelocity/4,
+                yVelocity/4,
+                Math.random()/2,
                 500,
-                color || '#C8AF9E',
-                !disableGravity,
-                startAlpha || 1
+                randomColours[Math.round(Math.random()*2)],
+                0, // disable gravity
+                0.8, // Alpha = 1
             ]);
         }
     }
@@ -407,11 +440,17 @@ function Game(opts){
         if(particles.length){
             particles = particles.filter(function(p){
                 var diff = (now - p[0])/(p[6]);
+
+                // If we're finished, don't do anything.
+                if(diff >= 1){
+                    return false;
+                }
+
+                // Otherwise, let's get particleing!
                 var x = p[1] + p[3] * diff;
                 var y = p[2] + p[4] * diff;
                 var z = (p[5]*tileHalf*diff)* (p[8] ? (1-diff*diff) : 1);
                 var pos = getIsometricPos(x, y, tileSize);
-                // ctx.fillRect(pos[0] + viewport[0], pos[1] + viewport[1], 5, 5);
                 drawCube(ctx,
                     pos[0] + viewport[0],
                     pos[1] + viewport[1] - z,
@@ -419,21 +458,10 @@ function Game(opts){
                     particleSize,
                     particleSize,
                     p[7],
-                    diff > 0.5 ? p[9] - (diff-0.5)*2 : p[9]
+                    diff > 0.5 ? Math.max(0, p[9] * (1-diff)) : p[9]
                 );
-                // drawCube(ctx,
-                //     pos[0] + viewport[0],
-                //     pos[1] + viewport[1],
-                //     particleSize,
-                //     particleSize,
-                //     0,
-                //     '#000000',
-                //     0.25,
-                //     1-diff
-                // );
-                if(diff*p[6] < p[6]){
-                    return true;
-                }
+
+                return 1;
             });
         }
     }
@@ -503,7 +531,7 @@ function Game(opts){
     }
 
     function showTooltip(message, title, tile, cb){
-        modal.show(message, title, spriteCache[tile].c.toDataURL(), 1, cb);
+        modal.show(message, title, tile ? spriteCache[tile].c.toDataURL() : 0, 1, cb);
     }
 
     _this.setTile = function(tile, cb){
@@ -792,8 +820,24 @@ function Game(opts){
             playSound('win', result.win.length/10+0.1);
             playSound('win', result.win.length/10+0.2);
             setTimeout(function(){
-                if(opts.onwin){
-                    opts.onwin.call(_this);
+                // If we have an outro, show it.
+                if(opts.outro){
+                    showTooltip(
+                        opts.outro[0], // message
+                        opts.outro[1], // title
+                        opts.outro[2], // tile
+                        function(){
+                            // then call back.
+                            if(opts.onwin){
+                                opts.onwin.call(_this);
+                            }
+                        }
+                    );
+                } else {
+                    // Just call back straight away
+                    if(opts.onwin){
+                        opts.onwin.call(_this);
+                    }
                 }
             },result.win.length*100+2000);
         } else {
@@ -973,7 +1017,7 @@ function Game(opts){
                 tileQueueContext.drawImage(
                     spriteCache[tile].c, // cacned canvas tile
                     getTileQueuePos(i) + drawTileQueueOffset, // x
-                    0-tileHalf*0.75 - (i===0 ? Math.max(0, Math.sin(now/200))*5 : 1), //y
+                    0-tileHalf*0.75 - (i===0 && !selectedTile ? Math.max(0, Math.sin(now/200))*5 : 1), //y
                     tileHalf, // w
                     tileSize //h
                 );
@@ -1047,8 +1091,9 @@ function Game(opts){
                         var indicatorTileName = lastHoveredTileType === 'helipad' || canPlaceTileHere(selectedTile, lastHoveredTileCoords) ? 'ok' : 'notok';
                         ctx.drawImage(spriteCache[indicatorTileName].c, lastHoveredTilePos[0] - tileSize/2 + viewport[0], lastHoveredTilePos[1] - tileSize*1.5 + viewport[1]);
                     }
-                } else {
+                } else if(tileSelectType === 0){
                     // We're not dragging, but this tile has been selected.
+                    // And it's not been selected from the helipad.
                     ctx.drawImage(
                         spriteCache[selectedTile].c, // cached canvas tile
                         getTileQueuePos(0), // x
@@ -1060,6 +1105,7 @@ function Game(opts){
         }
         drawParticles();
 
+        // Dev mode: show the path we've found.
         // if(currentConnectedPath){
         //     currentConnectedPath.map(function(tile){
         //         var pos = getIsometricPos(tile[0], tile[1], tileSize);

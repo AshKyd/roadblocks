@@ -16,7 +16,7 @@ function addCol(a, y, max, type){
 }
 
 var roadBase = 'roady-base';
-var forest = 'forest';
+var forest = 'forest2';
 var water = 'water';
 
 var levels = {
@@ -83,7 +83,7 @@ var levels = {
                 [1,0,roadBase],
                 [1,3,'helipad'],
                 [1,2,forest],
-                [2,3,forest],
+                [2,3,'forest'],
                 [3,3,forest],
             ],
             name: 'The Block Forest',
@@ -123,8 +123,9 @@ var levels = {
                 a.push([4,0,'palm']);
                 return a;
             })(),
-            name: 'Bulldozer Beach',
+            name: '★ Bulldozer Beach',
             intro: ['Long press to bulldoze a tile you no longer need.', 'Bulldoze', 'dump'],
+            outro: ['Congratulations. You\'ve unlocked <b>Free Map</b> mode from the main menu.', 'Free Map', 'dump'],
         },
         {
             seed:13,
@@ -181,7 +182,7 @@ var levels = {
                 return a;
             })(),
             name: 'Little condo by the sea',
-            intro: ['There are several ways to finish this level. See if you can build past the helipad.', 'Many ways', 'sand']
+            intro: ['There are several ways to finish this level. See if you can build past the helipad.', 'Many ways'],
         },
 
             { // 4
@@ -449,6 +450,9 @@ Object.keys(levels).forEach(function(key){
         after += (enc(payload).length + (enc(dist).length || 0) + enc(level.predef).length);
         if(level.intro){
             entry.push(level.intro);
+            if(level.outro){
+                entry.push(level.outro);
+            }
         }
         return entry;
     });

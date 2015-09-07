@@ -30,7 +30,7 @@ module.exports = {
             inner.className = '';
             for(var i=35; i>10; i--){
                 inner.style.fontSize = i+'px';
-                if(getElementHeight(inner) < height - 80){
+                if(getElementHeight(inner) < height - 100){
                     break;
                 }
             }

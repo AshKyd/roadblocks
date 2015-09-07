@@ -141,9 +141,7 @@ function Game(opts){
     // Game score!
     var totalPoints = 0;
     var globalPoints=0;
-    if(opts.points){
-        opts.points.innerText = 0;
-    }
+    updatePointsDisplay();
 
     // Load up the tile queue & pre-cache all our tiles.
     if(opts.dist){
@@ -683,7 +681,7 @@ function Game(opts){
         return howMany;
     }
     function updatePointsDisplay(){
-        opts.points.innerText = totalPoints + globalPoints;
+        document.querySelector('#p').innerText = totalPoints + globalPoints;
     }
     function drawPoints(){
         ctx.font = "bold 25px serif";

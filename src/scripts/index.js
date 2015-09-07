@@ -5,7 +5,6 @@ var canvas = d.querySelector('canvas');
 canvas.width = innerWidth;
 canvas.height = innerHeight;
 var ctx = canvas.getContext('2d');
-var points = d.querySelector('#p');
 var levels = require('./l');
 var SpriteLib = require('./sprites');
 var logo = require('./logo');
@@ -13,6 +12,8 @@ var playSound = require('./sfx');
 var modal = require('./modal');
 var Storage = require('./storage');
 var tileList = d.querySelector('#tl');
+
+localStorage.uniqueId = localStorage.uniqueId || Math.round(Math.random()*1e6);
 
 /**
  * Fire up a game and render one single tile as specified.
@@ -40,11 +41,19 @@ var thisLevelId;
 var thisGameType;
 var actions = {
     restart: function(){
+        _LTracker.push({
+            action: 'Restart',
+            uid: localStorage.uniqueId
+        });
         thisGame.destroy(function(){
             loadGame(thisGameType, thisLevelId);
         });
     },
     menu: function(){
+        _LTracker.push({
+            action: 'Menu click',
+            uid: localStorage.uniqueId
+        });
         if(thisGame){
             thisGame.destroy(function(){
                 showMenu();
@@ -52,6 +61,10 @@ var actions = {
         }
     },
     Puzzle: function(){
+        _LTracker.push({
+            action: 'Show puzzles menu',
+            uid: localStorage.uniqueId
+        });
         modal.show(
             levels.Puzzle.map(function(level, i){
                 var unlocked = (!i || Storage.state['Puzzle'+i]);
@@ -66,8 +79,16 @@ var actions = {
     },
     'Free map': function(){
         if(!Storage.state.Puzzle5){
+            _LTracker.push({
+                action: 'Free map locked',
+                uid: localStorage.uniqueId
+            });
             modal.show('Unlock this mode by completing more puzzles.', 'Mode locked');
         } else {
+            _LTracker.push({
+                action: 'Free map',
+                uid: localStorage.uniqueId
+            });
             tileList.innerHTML = SpriteLib.placeable.map(function(sprite){
                 return '<img id="t'+sprite+'" src="'+drawTile(sprite, 128)+'" data-action="p" data-s="'+sprite+'">';
             }).join('');
@@ -88,6 +109,11 @@ var actions = {
 
     // place tile
     p: function(data){
+        _LTracker.push({
+            action: 'Place tile',
+            data: data,
+            uid: localStorage.uniqueId
+        });
         var prevActive = d.querySelector('#tl .active');
         if(prevActive){
             prevActive.className = '';
@@ -115,6 +141,11 @@ d.body.onclick = function(e){
 };
 
 function loadGame(gameType, levelId){
+    _LTracker.push({
+        action: 'Level '+levelId,
+        uid: localStorage.uniqueId
+    });
+
     d.body.className = '';
     thisGameType = gameType;
     levelId = Number(levelId);
@@ -137,10 +168,13 @@ function loadGame(gameType, levelId){
     }
 
     level.canvas = canvas;
-    level.points = 0;
     level.gameType = gameType;
 
     level.onwin = function(){
+        _LTracker.push({
+            action: 'Win',
+            uid: localStorage.uniqueId
+        });
         thisGame.destroy();
         loadGame(gameType, levelId+1);
         w.location.hash = gameType+'-'+(levelId+1);
@@ -148,6 +182,10 @@ function loadGame(gameType, levelId){
     };
 
     level.onlose = function(){
+        _LTracker.push({
+            action: 'Autolos',
+            uid: localStorage.uniqueId
+        });
         thisGame.destroy(function(){
             modal.show('Looks like you got stuck. Tap to try again.', 'Level failed', null, 1, function(){
                 loadGame(gameType, levelId);
@@ -159,6 +197,10 @@ function loadGame(gameType, levelId){
 }
 
 function showMenu(){
+    _LTracker.push({
+        action: 'Menu',
+        uid: localStorage.uniqueId
+    });
     // hide the tile list dialog from free mode
     tileList.className = '';
     logo(canvas,ctx,0,1);
@@ -174,11 +216,24 @@ function showMenu(){
     playSound('dialog');
 }
 
-logo(canvas, ctx, function(){
-    if(window.location.hash){
-        loadGame.apply(null, window.location.hash.substr(1).split('-'));
-    } else {
-        // loadGame(0);
-        showMenu();
-    }
-});
+if(!_LTracker.session_id){
+    modal.show(
+        'Howdy. During the beta phase I\'m using <a href="https://www.loggly.com/">Loggly</a> to gather analytics.'+
+        'All it\'s doing is logging crashes and gameplay stats (duration, play count etc). Could you please let it run just this once? Thank you!',
+        'Unblock trackers, yo',
+        null,
+        1,
+        function(){
+            window.location.reload();
+        }
+    );
+} else {
+    logo(canvas, ctx, function(){
+        if(window.location.hash){
+            loadGame.apply(null, window.location.hash.substr(1).split('-'));
+        } else {
+            // loadGame(0);
+            showMenu();
+        }
+    });
+}

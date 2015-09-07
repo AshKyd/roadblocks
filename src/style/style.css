@@ -92,40 +92,6 @@ html{
     max-width:200px;
 }
 
-@media(min-width: 800px){
-    #tt{
-        left:20%;
-        right:20%;
-        top:100px;
-        bottom:100px;
-    }
-}
-
-@media(max-height:768px){
-    #tt{
-        top:0;
-        left:0;
-        bottom:0;
-        right:0;
-        border-radius:0;
-        border:none;
-    }
-    #tt img{
-        max-height: 200px;
-    }
-}
-
-@media(max-height:490px) and (orientation: landscape){
-    #tt{
-        padding-left: 150px;
-    }
-    #tt img{
-        position:absolute;
-        left:20px;
-        top:50px;
-    }
-}
-
 /* buttons */
 #b{
     position:absolute;
@@ -141,11 +107,6 @@ html{
 .ingame #b,
 .rumble{
     left:0;
-}
-@media(max-width:800px){
-    #b{
-        font-size:20px;
-    }
 }
 
 #b a{
@@ -292,7 +253,7 @@ body.menu #menu{
 .pill.active:hover,
 #b a:hover{
     background: #55bbff;
-    transform:scale(1.1, 1.05);
+    transform:scale(1.1);
 }
 
 #menu img{
@@ -344,4 +305,55 @@ body.menu #menu{
 #tl img.active{
     transform:scale(1.1);
     background:white;
+}
+
+
+
+@media(min-width: 800px){
+    #tt{
+        left:20%;
+        right:20%;
+        top:100px;
+        bottom:100px;
+    }
+    #tt-inner{
+        padding:30px 50px;
+    }
+
+    #menu > div:hover,
+    .pill.active:hover,
+    #b a:hover{
+        background: #55bbff;
+        transform:scale(1.01);
+    }
+}
+
+@media(max-height:768px){
+    #tt{
+        top:0;
+        left:0;
+        bottom:0;
+        right:0;
+        border-radius:0;
+        border:none;
+    }
+    #tt img{
+        max-height: 200px;
+    }
+}
+
+@media(max-height:490px) and (orientation: landscape){
+    #tt{
+        padding-left: 150px;
+    }
+    #tt img{
+        position:absolute;
+        left:20px;
+        top:50px;
+    }
+}
+@media(max-width:800px){
+    #b{
+        font-size:20px;
+    }
 }

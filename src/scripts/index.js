@@ -15,6 +15,14 @@ var tileList = d.querySelector('#tl');
 
 localStorage.uniqueId = localStorage.uniqueId || Math.round(Math.random()*1e6);
 
+
+_LTracker.push({
+    action: 'Startup',
+    uid: localStorage.uniqueId,
+    ua: navigator.userAgent,
+    res: canvas.width + 'x' + canvas.height,
+});
+
 /**
  * Fire up a game and render one single tile as specified.
  */
@@ -98,6 +106,9 @@ var actions = {
     },
     Exit: function(){
         window.close();
+    },
+    'Report a bug': function(){
+        window.open('https://github.com/AshKyd/roadblocks/issues/new');
     },
 
     // Load puzzle game
@@ -208,7 +219,8 @@ function showMenu(){
     d.querySelector('#menu').innerHTML = [
         ['Puzzle','roadx-base'],
         ['Free map','dump'],
-        ['Exit','grass'], // Only useful for app modes.
+        ['Report a bug','grass'],
+        // ['Exit','grass'], // Only useful for app modes.
     ].map(function(text){
         var dac = ' data-action="'+text[0]+'"';
         return '<div'+dac+'><img'+dac+' src="'+drawTile(text[1], canvas.width/5)+'">'+text[0]+'</div>';
@@ -221,7 +233,7 @@ if(!_LTracker.session_id){
         'Howdy. During the beta phase I\'m using <a href="https://www.loggly.com/">Loggly</a> to gather analytics.'+
         'All it\'s doing is logging crashes and gameplay stats (duration, play count etc). Could you please let it run just this once? Thank you!',
         'Unblock trackers, yo',
-        null,
+        0,
         1,
         function(){
             window.location.reload();
@@ -229,11 +241,19 @@ if(!_LTracker.session_id){
     );
 } else {
     logo(canvas, ctx, function(){
-        if(window.location.hash){
-            loadGame.apply(null, window.location.hash.substr(1).split('-'));
-        } else {
-            // loadGame(0);
-            showMenu();
-        }
+        modal.show(
+            'This is a beta version, please feel free to leave <a href="https://github.com/AshKyd/roadblocks/issues/new" target="_blank">bug reports &amp; feedback</a>! (You\'ll need a free GitHub account to do this.)',
+            'Thanks for testing!',
+            0,
+            1,
+            function(){
+                if(window.location.hash){
+                    loadGame.apply(null, window.location.hash.substr(1).split('-'));
+                } else {
+                    // loadGame(0);
+                    showMenu();
+                }
+            }
+        );
     });
 }

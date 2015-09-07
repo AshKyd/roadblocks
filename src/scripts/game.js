@@ -435,7 +435,7 @@ function Game(opts){
     }
 
     function drawParticles(){
-        if(particles.length){
+        if(particles.length && 1000/time > 30){
             particles = particles.filter(function(p){
                 var diff = (now - p[0])/(p[6]);
 
@@ -963,7 +963,7 @@ function Game(opts){
 
         // Treat water tiles differently so we can get the sweet sine wave ripple.
         // Only do this if we're over 20 fps as it's kinda slow.
-        if(tile === 'water' && 1000/time > 20){
+        if(tile === 'water' && 1000/time > 30){
             ctx.drawImage(spriteCanvas.c, currentDrawPos[0] - tileSize/2, currentDrawPos[1] - tileSize*1.5 - Math.sin(x+y+now/200)*2 );
         } else {
             ctx.drawImage(spriteCanvas.c, currentDrawPos[0] - tileSize/2, currentDrawPos[1] - tileSize*1.5);

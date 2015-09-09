@@ -225,7 +225,7 @@ function showMenu(){
         // ['Exit','grass'], // Only useful for app modes.
     ].map(function(text){
         var dac = ' data-action="'+text[0]+'"';
-        return '<div'+dac+'><img'+dac+' src="'+drawTile(text[1], canvas.width/5)+'">'+text[0]+'</div>';
+        return '<div'+dac+'><img'+dac+' src="'+drawTile(text[1], Math.min(canvas.width, canvas.height)/4)+'">'+text[0]+'</div>';
     }).join('');
     playSound('dialog');
 }

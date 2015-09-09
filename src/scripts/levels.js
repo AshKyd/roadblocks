@@ -153,37 +153,6 @@ var levels = {
             })(),
             name: 'Palm Island',
         },
-        {
-            seed: 14,
-            w:8,
-            h:8,
-            wMod:4,
-            base: 'sand',
-            strict: 1,
-            dist:[0,1,2,0,5,3,4,6,7,1,1,5,5,4,4,1,3],
-            predef: (function(){
-                var a = [
-                    [3,7,roadBase],
-                    [5,0,roadBase],
-                ];
-                addRow(a,0,8,water);
-                addRow(a,1,8,water);
-                addRow(a,7,8,water);
-                addCol(a,4,7,water);
-                addCol(a,0,7,water);
-                a.push([5,0,'broady']);
-                a.push([6,4,'broady']);
-                a.push([3,4,'broady']);
-                a.push([2,2,'building']);
-                a.push([2,1,'forest']);
-                a.push([3,1,'building']);
-                a.push([6,6,'helipad']);
-
-                return a;
-            })(),
-            name: 'Little condo by the sea',
-            intro: ['There are several ways to finish this level. See if you can build past the helipad.', 'Many ways'],
-        },
 
             { // 4
                 seed: 200,
@@ -312,7 +281,38 @@ var levels = {
                     return a;
                 })(),
                 name: 'Dual Carriageway'
-            }
+            },
+            {
+                seed: 14,
+                w:8,
+                h:8,
+                wMod:4,
+                base: 'sand',
+                strict: 1,
+                dist:[0,1,2,0,5,3,4,6,7,1,1,5,5,4,4,1,3],
+                predef: (function(){
+                    var a = [
+                        [3,7,roadBase],
+                        [5,0,roadBase],
+                    ];
+                    addRow(a,0,8,water);
+                    addRow(a,1,8,water);
+                    addRow(a,7,8,water);
+                    addCol(a,4,7,water);
+                    addCol(a,0,7,water);
+                    a.push([5,0,'broady']);
+                    a.push([6,4,'broady']);
+                    a.push([2,2,'building']);
+                    a.push([2,5,'palm']);
+                    a.push([2,7,'palm']);
+                    a.push([2,1,'forest']);
+                    a.push([3,1,'building']);
+                    a.push([6,6,'helipad']);
+
+                    return a;
+                })(),
+                name: 'Little condo by the sea',
+            },
     ],
     Free: [
         {

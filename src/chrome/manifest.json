@@ -1,0 +1,21 @@
+{
+   "app": {
+      "background": {
+         "scripts": [ "background.js" ]
+      }
+   },
+   "description": "Connect the map in this road building puzzle game.",
+   "icons": {
+      "16": "icons/16.png",
+      "48": "icons/48.png",
+      "128": "icons/128.png",
+      "512": "icons/512.png"
+   },
+   "manifest_version": 2,
+   "name": "Road Blocks",
+   "version": "1.0.1",
+   "permissions": [
+        "fullscreen",
+        "storage"
+    ]
+}

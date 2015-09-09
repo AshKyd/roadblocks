@@ -1072,31 +1072,33 @@ function Game(opts){
         if(!opts.renderOnly){
             drawTileQueue();
 
-            if(gameIsFree && selectedTile && lastHoveredTilePos){
-                // Draw our happiness indicator on the map.
-                ctx.drawImage(spriteCache.ok.c, lastHoveredTilePos[0] - tileSize/2 + viewport[0], lastHoveredTilePos[1] - tileSize*1.5 + viewport[1]);
-            } else if(selectedTile){
-                if(isTouching){
-                    // Draw the tile we're dragging right now.
-                    ctx.drawImage(
-                        spriteCache[selectedTile].c, // cached canvas tile
-                        lastTouch.clientX - tileSize/2, // x
-                        lastTouch.clientY - tileSize*1.25  - displayOffset
-                    );
+            if(renderChrome){
+                if(gameIsFree && selectedTile && lastHoveredTilePos){
+                    // Draw our happiness indicator on the map.
+                    ctx.drawImage(spriteCache.ok.c, lastHoveredTilePos[0] - tileSize/2 + viewport[0], lastHoveredTilePos[1] - tileSize*1.5 + viewport[1]);
+                } else if(selectedTile){
+                    if(isTouching){
+                        // Draw the tile we're dragging right now.
+                        ctx.drawImage(
+                            spriteCache[selectedTile].c, // cached canvas tile
+                            lastTouch.clientX - tileSize/2, // x
+                            lastTouch.clientY - tileSize*1.25  - displayOffset
+                        );
 
-                    // Draw the happiness indicator
-                    if(lastHoveredTilePos && map[lastHoveredTileCoords[0]] && map[lastHoveredTileCoords[0]][lastHoveredTileCoords[1]]){
-                        var indicatorTileName = lastHoveredTileType === 'helipad' || canPlaceTileHere(selectedTile, lastHoveredTileCoords) ? 'ok' : 'notok';
-                        ctx.drawImage(spriteCache[indicatorTileName].c, lastHoveredTilePos[0] - tileSize/2 + viewport[0], lastHoveredTilePos[1] - tileSize*1.5 + viewport[1]);
+                        // Draw the happiness indicator
+                        if(lastHoveredTilePos && map[lastHoveredTileCoords[0]] && map[lastHoveredTileCoords[0]][lastHoveredTileCoords[1]]){
+                            var indicatorTileName = lastHoveredTileType === 'helipad' || canPlaceTileHere(selectedTile, lastHoveredTileCoords) ? 'ok' : 'notok';
+                            ctx.drawImage(spriteCache[indicatorTileName].c, lastHoveredTilePos[0] - tileSize/2 + viewport[0], lastHoveredTilePos[1] - tileSize*1.5 + viewport[1]);
+                        }
+                    } else if(tileSelectType === 0){
+                        // We're not dragging, but this tile has been selected.
+                        // And it's not been selected from the helipad.
+                        ctx.drawImage(
+                            spriteCache[selectedTile].c, // cached canvas tile
+                            getTileQueuePos(0), // x
+                            0 - tileSize
+                        );
                     }
-                } else if(tileSelectType === 0){
-                    // We're not dragging, but this tile has been selected.
-                    // And it's not been selected from the helipad.
-                    ctx.drawImage(
-                        spriteCache[selectedTile].c, // cached canvas tile
-                        getTileQueuePos(0), // x
-                        0 - tileSize
-                    );
                 }
             }
             drawPoints();

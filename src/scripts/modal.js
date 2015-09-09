@@ -19,36 +19,36 @@ module.exports = {
         setTimeout(function(){
             tooltip.className = 'active';
             scrim.className = 'active';
-        }, 1);
 
-        // Copyfit the text to fit the dialog, regardless of screen size.
-        var height = getElementHeight(tooltip);
-        var inner = d.querySelector('#tt-inner');
-        var img = d.querySelector('#tt-inner img');
+            // Copyfit the text to fit the dialog, regardless of screen size.
+            var height = getElementHeight(tooltip);
+            var inner = d.querySelector('#tt-inner');
+            var img = d.querySelector('#tt-inner img');
 
-        if(copyfit){
-            inner.className = '';
-            for(var i=35; i>10; i--){
-                inner.style.fontSize = i+'px';
-                if(getElementHeight(inner) < height - 100){
-                    break;
+            if(copyfit){
+                inner.className = '';
+                for(var i=35; i>10; i--){
+                    inner.style.fontSize = i+'px';
+                    if(getElementHeight(inner) < height - 100){
+                        break;
+                    }
                 }
+            } else {
+                inner.className = 'scroll';
             }
-        } else {
-            inner.className = 'scroll';
-        }
 
-        function close(e){
-            e.preventDefault();
-            playSound('select');
-            module.exports.hide(cb);
-        }
-        document.querySelector('.close').onclick = close;
-        scrim.onclick = close;
-        tooltip.ontouchstart = tooltip.onclick;
-        setTimeout(function(){
-            playSound('dialog');
-        },10);
+            function close(e){
+                e.preventDefault();
+                playSound('select');
+                module.exports.hide(cb);
+            }
+            document.querySelector('.close').onclick = close;
+            scrim.onclick = close;
+            tooltip.ontouchstart = tooltip.onclick;
+            setTimeout(function(){
+                playSound('dialog');
+            },10);
+        }, 1);
     },
     hide: function(cb){
         tooltip.className = '';

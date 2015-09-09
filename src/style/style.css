@@ -87,7 +87,7 @@ html{
 
 #tt img{
     display:block;
-    margin:-15% auto 0;
+    margin:0 auto 0;
     padding-bottom:20px;
     max-width:200px;
 }

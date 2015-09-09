@@ -1,7 +1,6 @@
 var chromeStorage;
 try{
     chromeStorage = chrome.storage.sync;
-    console.log('using chrome storage');
 }catch(e){}
 
 module.exports = {
@@ -16,7 +15,6 @@ module.exports = {
 
 if(chromeStorage){
     chromeStorage.get('state', function(items){
-        console.log('got chrome storage', items);
         if(items.state){
             try{
                 module.exports.state = JSON.parse(items.state);

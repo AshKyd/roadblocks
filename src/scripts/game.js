@@ -14,8 +14,6 @@ var modal = require('./modal');
 var colorInterface = '#55bbff';
 var ingameclass = 'ingame';
 
-var round = Math.round;
-
 function crawlMap(map, w, h, fn){
     var returnVal, x, y;
     for(x=0; x<w; x++){
@@ -529,7 +527,13 @@ function Game(opts){
     }
 
     function showTooltip(message, title, tile, cb){
-        modal.show(message, title, tile ? spriteCache[tile].c.toDataURL() : 0, 1, cb);
+        var referenceCanvas = spriteCache[tile].c;
+        var newCanvas = document.createElement('canvas');
+        newCanvas.width = referenceCanvas.width;
+        newCanvas.height = referenceCanvas.height/1.5;
+        var newContext = newCanvas.getContext('2d');
+        newContext.drawImage(referenceCanvas, 0, 0-referenceCanvas.height/3);
+        modal.show(message, title, tile ? newCanvas.toDataURL() : 0, 1, cb);
     }
 
     _this.setTile = function(tile, cb){
@@ -997,8 +1001,8 @@ function Game(opts){
             tileQueueContext.fillRect(
                 0+i,
                 1 - i,
-                round(getTileQueuePos(0) + tileSize /2 + 10),
-                round(tileHalf + i*2)
+                Math.round(getTileQueuePos(0) + tileSize /2 + 10),
+                Math.round(tileHalf + i*2)
             );
         }
 

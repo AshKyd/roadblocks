@@ -13,16 +13,6 @@ var modal = require('./modal');
 var Storage = require('./storage');
 var tileList = d.querySelector('#tl');
 
-localStorage.uniqueId = localStorage.uniqueId || Math.round(Math.random()*1e6);
-
-
-_LTracker.push({
-    action: 'Startup',
-    uid: localStorage.uniqueId,
-    ua: navigator.userAgent,
-    res: canvas.width + 'x' + canvas.height,
-});
-
 /**
  * Fire up a game and render one single tile as specified.
  */
@@ -49,19 +39,11 @@ var thisLevelId;
 var thisGameType;
 var actions = {
     restart: function(){
-        _LTracker.push({
-            action: 'Restart',
-            uid: localStorage.uniqueId
-        });
         thisGame.destroy(function(){
             loadGame(thisGameType, thisLevelId);
         });
     },
     menu: function(){
-        _LTracker.push({
-            action: 'Menu click',
-            uid: localStorage.uniqueId
-        });
         if(thisGame){
             thisGame.destroy(function(){
                 showMenu();
@@ -69,10 +51,6 @@ var actions = {
         }
     },
     Puzzle: function(){
-        _LTracker.push({
-            action: 'Show puzzles menu',
-            uid: localStorage.uniqueId
-        });
         modal.show(
             levels.Puzzle.map(function(level, i){
                 var unlocked = (!i || Storage.state['Puzzle'+i]);
@@ -89,16 +67,8 @@ var actions = {
     },
     'Free map': function(){
         if(!Storage.state.Puzzle5){
-            _LTracker.push({
-                action: 'Free map locked',
-                uid: localStorage.uniqueId
-            });
             modal.show('Unlock this mode by completing more puzzles.', 'Mode locked');
         } else {
-            _LTracker.push({
-                action: 'Free map',
-                uid: localStorage.uniqueId
-            });
             tileList.innerHTML = SpriteLib.placeable.map(function(sprite){
                 return '<img id="t'+sprite+'" src="'+drawTile(sprite, 128)+'" data-action="p" data-s="'+sprite+'">';
             }).join('');
@@ -106,12 +76,12 @@ var actions = {
             loadGame('Free', 0);
         }
     },
-    Exit: function(){
-        window.close();
-    },
-    'Report a bug': function(){
-        window.open('https://github.com/AshKyd/roadblocks/issues/new');
-    },
+    // Exit: function(){
+    //     window.close();
+    // },
+    // 'Report a bug': function(){
+    //     window.open('https://github.com/AshKyd/roadblocks/issues/new');
+    // },
 
     // Load puzzle game
     l: function(data){
@@ -122,11 +92,6 @@ var actions = {
 
     // place tile
     p: function(data){
-        _LTracker.push({
-            action: 'Place tile',
-            data: data,
-            uid: localStorage.uniqueId
-        });
         var prevActive = d.querySelector('#tl .active');
         if(prevActive){
             prevActive.className = '';
@@ -154,11 +119,6 @@ d.body.onclick = function(e){
 };
 
 function loadGame(gameType, levelId){
-    _LTracker.push({
-        action: 'Level '+levelId,
-        uid: localStorage.uniqueId
-    });
-
     d.body.className = '';
     thisGameType = gameType;
     levelId = Number(levelId);
@@ -184,10 +144,6 @@ function loadGame(gameType, levelId){
     level.gameType = gameType;
 
     level.onwin = function(){
-        _LTracker.push({
-            action: 'Win',
-            uid: localStorage.uniqueId
-        });
         thisGame.destroy();
         loadGame(gameType, levelId+1);
         w.location.hash = gameType+'-'+(levelId+1);
@@ -195,10 +151,6 @@ function loadGame(gameType, levelId){
     };
 
     level.onlose = function(){
-        _LTracker.push({
-            action: 'Autolos',
-            uid: localStorage.uniqueId
-        });
         thisGame.destroy(function(){
             modal.show('Looks like you got stuck. Tap to try again.', 'Level failed', null, 1, function(){
                 loadGame(gameType, levelId);
@@ -210,10 +162,6 @@ function loadGame(gameType, levelId){
 }
 
 function showMenu(){
-    _LTracker.push({
-        action: 'Menu',
-        uid: localStorage.uniqueId
-    });
     // hide the tile list dialog from free mode
     tileList.className = '';
     logo(canvas,ctx,0,1);
@@ -221,7 +169,7 @@ function showMenu(){
     d.querySelector('#menu').innerHTML = [
         ['Puzzle','roadx-base'],
         ['Free map','dump'],
-        ['Report a bug','grass'],
+        // ['Report a bug','grass'],
         // ['Exit','grass'], // Only useful for app modes.
     ].map(function(text){
         var dac = ' data-action="'+text[0]+'"';
@@ -230,32 +178,4 @@ function showMenu(){
     playSound('dialog');
 }
 
-if(!_LTracker.session_id){
-    modal.show(
-        'Howdy. During the beta phase I\'m using <a href="https://www.loggly.com/">Loggly</a> to gather analytics.'+
-        'All it\'s doing is logging crashes and gameplay stats (duration, play count etc). Could you please let it run just this once? Thank you!',
-        'Unblock trackers, yo',
-        0,
-        1,
-        function(){
-            window.location.reload();
-        }
-    );
-} else {
-    logo(canvas, ctx, function(){
-        modal.show(
-            'This is a beta version, please feel free to leave <a href="https://github.com/AshKyd/roadblocks/issues/new" target="_blank">bug reports &amp; feedback</a>! (You\'ll need a free GitHub account to do this.)',
-            'Thanks for testing!',
-            0,
-            1,
-            function(){
-                if(window.location.hash){
-                    loadGame.apply(null, window.location.hash.substr(1).split('-'));
-                } else {
-                    // loadGame(0);
-                    showMenu();
-                }
-            }
-        );
-    });
-}
+showMenu();

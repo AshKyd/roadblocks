@@ -48,6 +48,22 @@ html{
     max-height:85%;
 }
 
+.attr{
+    position:absolute;
+    right:10px;
+    bottom:10px;
+    font-size:8px;
+    opacity:.2;
+    color:#fff;
+}
+.attr a{
+    color:#fff;
+}
+.attr:hover,
+.attr:focus{
+    opacity:1;
+}
+
 .close{
     position:absolute;
     bottom:20px;

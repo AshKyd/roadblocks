@@ -99,7 +99,6 @@ var actions = {
         var thisActive = d.querySelector('#t'+data.s);
         thisActive.className = 'active';
         thisGame.setTile(data.s, function(){
-            console.log('tile deselected');
             thisActive.className = '';
         });
 

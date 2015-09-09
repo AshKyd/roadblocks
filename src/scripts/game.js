@@ -393,7 +393,6 @@ function Game(opts){
     }
 
     var particles = [];
-    var particleSize = tileSize/30;
     function explode(pos, color){
         for(var i=0; i<8; i++){
             particles.push([
@@ -408,6 +407,7 @@ function Game(opts){
                 color,
                 1, // enable gravity
                 1, // Alpha = 1
+                tileSize/30,
             ]);
         }
     }
@@ -423,11 +423,12 @@ function Game(opts){
                 pos[1] - Math.random(),
                 xVelocity/4,
                 yVelocity/4,
-                Math.random()/2,
+                0-Math.random()/2,
                 500,
                 randomColours[Math.round(Math.random()*2)],
-                0, // disable gravity
+                -.5, // reverse gravity
                 0.8, // Alpha = 1
+                tileSize/50, // particle size
             ]);
         }
     }
@@ -445,14 +446,14 @@ function Game(opts){
                 // Otherwise, let's get particleing!
                 var x = p[1] + p[3] * diff;
                 var y = p[2] + p[4] * diff;
-                var z = (p[5]*tileHalf*diff)* (p[8] ? (1-diff*diff) : 1);
+                var z = (p[5]*tileHalf*diff) * (p[8]*diff*diff);
                 var pos = getIsometricPos(x, y, tileSize);
                 drawCube(ctx,
                     pos[0] + viewport[0],
                     pos[1] + viewport[1] - z,
-                    particleSize,
-                    particleSize,
-                    particleSize,
+                    p[10],
+                    p[10],
+                    p[10],
                     p[7],
                     diff > 0.5 ? Math.max(0, p[9] * (1-diff)) : p[9]
                 );

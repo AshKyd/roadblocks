@@ -42,6 +42,7 @@
     "deploy": "npm run clean; npm run build;rsync -avz dist/* direct.ash.ms:/var/www/ash.ms/public_html/js13k2k15/",
     "server": "mkdir -p dist; cd dist; beefy ../src/scripts/index.js:index.js",
     "watch": "npm run server & node node_modules/watch/cli.js 'npm run build' src --ignoreDotFiles",
-    "build-chrome": "npm run clean;npm run build & cp src/chrome/ chrome/ -R;wait;cp dist/* chrome/ -R;cd chrome;zip ../chrome.zip -r *"
+    "build-chrome": "npm run clean;npm run build & cp src/chrome/ chrome/ -R;wait;cp dist/* chrome/ -R;cd chrome;zip ../chrome.zip -r *",
+    "build-firefox": "npm run clean;npm run build & cp src/firefox/ firefox/ -R;wait;cp dist/* firefox/ -R;cd firefox;zip ../firefox.zip -r *"
   }
 }

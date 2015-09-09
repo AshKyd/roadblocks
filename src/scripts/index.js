@@ -76,9 +76,9 @@ var actions = {
             loadGame('Free', 0);
         }
     },
-    // Exit: function(){
-    //     window.close();
-    // },
+    Exit: function(){
+        window.close();
+    },
     // 'Report a bug': function(){
     //     window.open('https://github.com/AshKyd/roadblocks/issues/new');
     // },
@@ -169,7 +169,7 @@ function showMenu(){
         ['Puzzle','roadx-base'],
         ['Free map','dump'],
         // ['Report a bug','grass'],
-        // ['Exit','grass'], // Only useful for app modes.
+        ['Exit','grass'], // Only useful for app modes.
     ].map(function(text){
         var dac = ' data-action="'+text[0]+'"';
         return '<div'+dac+'><img'+dac+' src="'+drawTile(text[1], Math.min(canvas.width, canvas.height)/4)+'">'+text[0]+'</div>';

@@ -10,10 +10,10 @@ var tooltip = document.querySelector('#tt');
 var scrim = document.querySelector('#s');
 
 module.exports = {
-    show: function(message, title, tile, copyfit, cb){
+    show: function(message, title, tile, copyfit, cb, btn){
         title = title ? '<h1>'+title+'</h1>' : '';
         tile = tile ? '<img class="rubberBand" src="'+tile+'">' : '';
-        tooltip.innerHTML = '<div id="tt-inner"><a class="close">OK</a> '+title+message+tile+'</div>';
+        tooltip.innerHTML = '<div id="tt-inner"><a class="close">'+(btn||'OK')+'</a> '+title+message+tile+'</div>';
         tooltip.style.display = 'block';
         scrim.style.display = 'block';
         setTimeout(function(){

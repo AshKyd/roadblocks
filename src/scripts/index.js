@@ -82,7 +82,9 @@ var actions = {
             }).join(''),
             'Puzzle play',
             null,
-            0
+            0,
+            0,
+            'Back'
         );
     },
     'Free map': function(){

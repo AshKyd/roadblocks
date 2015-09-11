@@ -201,7 +201,6 @@ function showMenu(){
     // hide the tile list dialog from free mode
     tileList.className = '';
     logo(canvas,ctx,0,1);
-    d.body.className = 'menu';
     d.querySelector('#menu').innerHTML = [
         ['Puzzle','roadx-base'],
         ['Free map','dump'],
@@ -211,6 +210,7 @@ function showMenu(){
         var dac = ' data-action="'+text[0]+'"';
         return '<div'+dac+'><img'+dac+' src="'+drawTile(text[1], Math.min(canvas.width, canvas.height)/4)+'">'+text[0]+'</div>';
     }).join('');
+    d.body.className = 'menu';
     playSound('dialog');
 }
 

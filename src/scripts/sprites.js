@@ -22,7 +22,6 @@
 
 var exaggeration = innerWidth < 800 ? 2 : 1;
 
-var random = require('./random');
 var roadColor = '#444444';
 var elkColor = '#AE907A';
 var grey1 = '#aaaaaa';
@@ -138,9 +137,7 @@ var sprites =  {
     sandSurface: [
         [-0.25,0, 0, 1, 1, 0.25, yellowSand],
     ],
-    concreteSurface: [
-        [-0.25,0, 0, 1, 1, 0.25, grey1],
-    ],
+    c: [],
     grass: [
         ['ground',0,0,0],
         ['grassSurface',0,0,0],
@@ -180,7 +177,7 @@ var sprites =  {
     ],
     helipad: [
         ['ground',0,0,0],
-        ['concreteSurface',0,0,0],
+        [-0.25,0, 0, 1, 1, 0.25, grey1],
 
         // rear red light
         [0,0.95,0.95,0.05,.05,.1,red1],
@@ -324,6 +321,7 @@ var sprites =  {
         ['tree', 0, .4,.2],
     ],
 };
+
 Object.keys(sprites).map(function(spriteName){
     if(spriteName.indexOf('road') === 0){
         sprites[spriteName+'-base'] = sprites.ground.concat(sprites[spriteName]);
@@ -347,7 +345,7 @@ var tileLogic = {
 	roadxy: {
         c: [1,1,1,1],
         p: canPlaceIfDefaultTile,
-        firstrun: 'Cars will travel straight through intersections without making turns. You can double back over road you\'ve already placed.',
+        firstrun: 'Cars will travel through intersections without making turns. You can double back over road you\'ve already placed.',
         title: 'Intersection'
     },
 	roadx2yl: {
@@ -376,8 +374,6 @@ var tileLogic = {
     },
     building: {
         p: canPlaceIfDefaultTile,
-        title: 'Buildings',
-        firstrun: "Place buildings alongside roads for extra points.",
         points: 100
     },
     dump: 1,

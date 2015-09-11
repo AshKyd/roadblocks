@@ -6,7 +6,6 @@ var tileLogic = SpriteLib.tileLogic;
 var firstruns = {};
 var playSound = require('./sfx');
 var jsonStringify = JSON.stringify;
-var random = require('./random');
 var touchList = require('./touchlist');
 var jsonStringify = JSON.stringify;
 var modal = require('./modal');
@@ -1134,9 +1133,9 @@ function Game(opts){
             showTooltip.apply(this, opts.intro);
         }
 
-        setInterval(function(){
-            console.log('fps',1000/time);
-        },1000);
+        // setInterval(function(){
+        //     console.log('fps',1000/time);
+        // },1000);
     }
 }
 

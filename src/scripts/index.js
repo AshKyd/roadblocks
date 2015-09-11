@@ -88,10 +88,10 @@ var actions = {
     },
     menu: function(){
         if(thisGame){
-            thisGame = 0;
             thisGame.destroy(function(){
                 showMenu();
             });
+            thisGame = 0;
         }
     },
     Puzzle: function(){

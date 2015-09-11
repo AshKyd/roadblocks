@@ -10,12 +10,14 @@ var tooltip = document.querySelector('#tt');
 var scrim = document.querySelector('#s');
 
 module.exports = {
+    visible: false,
     show: function(message, title, tile, copyfit, cb, btn){
         title = title ? '<h1>'+title+'</h1>' : '';
         tile = tile ? '<img class="rubberBand" src="'+tile+'">' : '';
         tooltip.innerHTML = '<div id="tt-inner"><a class="close">'+(btn||'OK')+'</a> '+title+message+tile+'</div>';
         tooltip.style.display = 'block';
         scrim.style.display = 'block';
+        module.exports.visible = true;
         setTimeout(function(){
             tooltip.className = 'active';
             scrim.className = 'active';
@@ -53,6 +55,7 @@ module.exports = {
     hide: function(cb){
         tooltip.className = '';
         scrim.className = '';
+        module.exports.visible = true;
         setTimeout(function(){
             tooltip.style.display = 'none';
             scrim.style.display = 'none';

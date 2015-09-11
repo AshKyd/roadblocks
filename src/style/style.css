@@ -298,12 +298,14 @@ body.menu #menu{
     right:0;
     top:0;
     bottom:0;
-    width:10%;
+    width:15%;
     max-width:128px;
     background: #55bbff;
     border-left: 1px solid white;
     transform:translateX(110%);
     overflow-y:auto;
+    /* Overlap points display we don't want */
+    z-index: 5;
 }
 #tl.active{
     transform:translateX(0);

@@ -1,0 +1,14 @@
+{
+  "name": "Road Blocks",
+  "description": "Connect the map in this road building puzzle game.",
+  "launch_path": "/index.html",
+  "icons": {
+      "128": "/icons/128.png",
+      "512": "/icons/512.png"
+  },
+  "developer": {
+    "name": "Space Kid Games",
+    "url": "http://spacekidgames.com/road-blocks/"
+  },
+  "default_locale": "en"
+}

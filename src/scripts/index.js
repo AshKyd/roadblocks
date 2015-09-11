@@ -13,6 +13,49 @@ var modal = require('./modal');
 var Storage = require('./storage');
 var tileList = d.querySelector('#tl');
 
+// Previous active tile.
+var thisActive;
+
+// Press escape to close dialogs, clear selection.
+d.onkeydown = function(evt) {
+    evt = evt || window.event;
+    if (evt.keyCode == 27) {
+        if(thisActive){
+            // If we have an active tile, deselect it
+            deselectTile();
+        } else if(modal.visible){
+            // if we  have a visible modal,
+            modal.hide();
+        } else if(thisGame) {
+            // TODO: Show a dialog "are you sure you want to quit"
+        } else {
+            try{
+                window.close();
+            } catch(e){
+
+            }
+        }
+    }
+};
+
+d.body.onclick = function(e){
+    var data = e.target.dataset;
+    if(actions[data.action]){
+        actions[data.action](data);
+        return false;
+    }
+    if(thisGame[data.action]){
+        thisGame[data.action](data);
+        return false;
+    }
+};
+
+function deselectTile(){
+    thisGame.setTile('', 0);
+    thisActive.className = '';
+    thisActive = 0;
+}
+
 /**
  * Fire up a game and render one single tile as specified.
  */
@@ -48,6 +91,7 @@ var actions = {
             thisGame.destroy(function(){
                 showMenu();
             });
+            thisGame = 0;
         }
     },
     Puzzle: function(){
@@ -76,9 +120,9 @@ var actions = {
             loadGame('Free', 0);
         }
     },
-    // Exit: function(){
-    //     window.close();
-    // },
+    Exit: function(){
+        window.close();
+    },
     // 'Report a bug': function(){
     //     window.open('https://github.com/AshKyd/roadblocks/issues/new');
     // },
@@ -92,28 +136,19 @@ var actions = {
 
     // place tile
     p: function(data){
-        var prevActive = d.querySelector('#tl .active');
+        var prevActive = thisActive;
         if(prevActive){
             prevActive.className = '';
         }
-        var thisActive = d.querySelector('#t'+data.s);
-        thisActive.className = 'active';
-        thisGame.setTile(data.s, function(){
-            thisActive.className = '';
-        });
-
-    }
-};
-
-d.body.onclick = function(e){
-    var data = e.target.dataset;
-    if(actions[data.action]){
-        actions[data.action](data);
-        return false;
-    }
-    if(thisGame[data.action]){
-        thisGame[data.action](data);
-        return false;
+        thisActive = d.querySelector('#t'+data.s);
+        if(prevActive === thisActive){
+            deselectTile();
+        } else {
+            thisActive.className = 'active';
+            thisGame.setTile(data.s, function(){
+                deselectTile();
+            });
+        }
     }
 };
 
@@ -141,6 +176,7 @@ function loadGame(gameType, levelId){
 
     level.canvas = canvas;
     level.gameType = gameType;
+    level.offsetTouch = gameType !== 'Free';
 
     level.onwin = function(){
         thisGame.destroy();
@@ -169,7 +205,7 @@ function showMenu(){
         ['Puzzle','roadx-base'],
         ['Free map','dump'],
         // ['Report a bug','grass'],
-        // ['Exit','grass'], // Only useful for app modes.
+        ['Exit','grass'], // Only useful for app modes.
     ].map(function(text){
         var dac = ' data-action="'+text[0]+'"';
         return '<div'+dac+'><img'+dac+' src="'+drawTile(text[1], Math.min(canvas.width, canvas.height)/4)+'">'+text[0]+'</div>';

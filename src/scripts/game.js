@@ -210,7 +210,7 @@ function Game(opts){
         var touch = touchList(e);
         isTouching=1;
 
-        if(touch.is){ // If this is a touch event
+        if(touch.is && opts.offsetTouch){ // If this is a touch event
             displayOffset = 40;
         } else {
             displayOffset = 0;
@@ -225,6 +225,15 @@ function Game(opts){
         lastHoveredTileCoords = getPixelPosFromTouch(touch);
         lastHoveredTileType = getTileFromTouch(touch);
         lastHoveredTilePos = getIsometricPos(lastHoveredTileCoords[0], lastHoveredTileCoords[1], tileSize);
+
+        // If there's no tile under where we are, reset everything.
+        if(!tileundertouch){
+            selectedTile = 0;
+            if(tileChangeCallback){
+                tileChangeCallback();
+                tileChangeCallback = 0;
+            }
+        }
 
         if(selectedTile){
             if(
@@ -243,14 +252,6 @@ function Game(opts){
             playSound('select');
             tileSelectType = 0;
             return;
-        }
-
-        if(!tileundertouch){
-            selectedTile = 0;
-            if(tileChangeCallback){
-                tileChangeCallback();
-                tileChangeCallback = 0;
-            }
         }
 
         if(tileundertouch === 'helipad' && heliStack.length){
@@ -405,7 +406,7 @@ function Game(opts){
                 displayOffset ? 800 : 500, // touch devices animate for longer
                                            // because our fingers are in the way
                 color,
-                1, // enable gravity
+                -1, // enable gravity
                 1, // Alpha = 1
                 tileSize/30,
             ]);
@@ -426,7 +427,7 @@ function Game(opts){
                 0-Math.random()/2,
                 500,
                 randomColours[Math.round(Math.random()*2)],
-                -.5, // reverse gravity
+                -0.5, // reverse gravity
                 0.8, // Alpha = 1
                 tileSize/50, // particle size
             ]);
@@ -435,6 +436,7 @@ function Game(opts){
 
     function drawParticles(){
         if(particles.length && 1000/time > 30){
+            console.log('particles');
             particles = particles.filter(function(p){
                 var diff = (now - p[0])/(p[6]);
 
@@ -1132,9 +1134,9 @@ function Game(opts){
             showTooltip.apply(this, opts.intro);
         }
 
-        // setInterval(function(){
-        //     console.log('fps',1000/time);
-        // },1000);
+        setInterval(function(){
+            console.log('fps',1000/time);
+        },1000);
     }
 }
 

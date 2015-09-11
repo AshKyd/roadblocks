@@ -5,6 +5,6 @@ dist-chrome
 levels-compiled.json
 firefox.zip
 chrome.zip
-firefox
-chrome
+/firefox
+/chrome
 .levels.json

@@ -21,7 +21,19 @@ d.onkeydown = function(evt) {
     evt = evt || window.event;
     if (evt.keyCode == 27) {
         if(thisActive){
+            // If we have an active tile, deselect it
             deselectTile();
+        } else if(modal.visible){
+            // if we  have a visible modal,
+            modal.hide();
+        } else if(thisGame) {
+            // TODO: Show a dialog "are you sure you want to quit"
+        } else {
+            try{
+                window.close();
+            } catch(e){
+
+            }
         }
     }
 };
@@ -76,6 +88,7 @@ var actions = {
     },
     menu: function(){
         if(thisGame){
+            thisGame = 0;
             thisGame.destroy(function(){
                 showMenu();
             });

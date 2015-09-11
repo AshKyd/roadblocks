@@ -13,6 +13,37 @@ var modal = require('./modal');
 var Storage = require('./storage');
 var tileList = d.querySelector('#tl');
 
+// Previous active tile.
+var thisActive;
+
+// Press escape to close dialogs, clear selection.
+d.onkeydown = function(evt) {
+    evt = evt || window.event;
+    if (evt.keyCode == 27) {
+        if(thisActive){
+            deselectTile();
+        }
+    }
+};
+
+d.body.onclick = function(e){
+    var data = e.target.dataset;
+    if(actions[data.action]){
+        actions[data.action](data);
+        return false;
+    }
+    if(thisGame[data.action]){
+        thisGame[data.action](data);
+        return false;
+    }
+};
+
+function deselectTile(){
+    thisGame.setTile('', 0);
+    thisActive.className = '';
+    thisActive = 0;
+}
+
 /**
  * Fire up a game and render one single tile as specified.
  */
@@ -92,28 +123,20 @@ var actions = {
 
     // place tile
     p: function(data){
-        var prevActive = d.querySelector('#tl .active');
+        var prevActive = thisActive;
         if(prevActive){
             prevActive.className = '';
         }
-        var thisActive = d.querySelector('#t'+data.s);
-        thisActive.className = 'active';
-        thisGame.setTile(data.s, function(){
-            thisActive.className = '';
-        });
+        thisActive = d.querySelector('#t'+data.s);
+        if(prevActive === thisActive){
+            deselectTile();
+        } else {
+            thisActive.className = 'active';
+            thisGame.setTile(data.s, function(){
+                deselectTile();
+            });
+        }
 
-    }
-};
-
-d.body.onclick = function(e){
-    var data = e.target.dataset;
-    if(actions[data.action]){
-        actions[data.action](data);
-        return false;
-    }
-    if(thisGame[data.action]){
-        thisGame[data.action](data);
-        return false;
     }
 };
 
@@ -141,6 +164,7 @@ function loadGame(gameType, levelId){
 
     level.canvas = canvas;
     level.gameType = gameType;
+    level.offsetTouch = gameType !== 'Free';
 
     level.onwin = function(){
         thisGame.destroy();

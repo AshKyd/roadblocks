@@ -214,4 +214,14 @@ function showMenu(){
     playSound('dialog');
 }
 
-showMenu();
+if(window.AudioContext || window.webkitAudioContext){
+    showMenu();
+} else {
+    modal.show(
+        'This browser is too old to run Road Blocks.'+
+        '<a class="pill active" href="http://spacekidgames.com/road-blocks/system-requirements">Find out more</a>',
+        'Unsupported',
+        null,
+        1
+    );
+}

@@ -1,4 +1,9 @@
-var context = new (window.AudioContext || webkitAudioContext)();
+var ac = window.AudioContext || window.webkitAudioContext;
+if(!ac){
+    module.exports = function(){};
+    return;
+}
+var context = new ac();
 
 var jsfxr = require('./jsfxr');
 var audioCache = {};

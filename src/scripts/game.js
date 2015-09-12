@@ -435,7 +435,6 @@ function Game(opts){
 
     function drawParticles(){
         if(particles.length && 1000/time > 30){
-            console.log('particles');
             particles = particles.filter(function(p){
                 var diff = (now - p[0])/(p[6]);
 

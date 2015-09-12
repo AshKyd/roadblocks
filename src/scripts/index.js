@@ -10,7 +10,12 @@ var SpriteLib = require('./sprites');
 var logo = require('./logo');
 var playSound = require('./sfx');
 var modal = require('./modal');
-var Storage = require('./storage');
+var Storage = {
+    set: function(key, value){
+        localStorage[key] = value;
+    },
+    state: localStorage
+};
 var tileList = d.querySelector('#tl');
 
 // Previous active tile.

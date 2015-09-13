@@ -109,7 +109,7 @@ html{
 }
 
 /* buttons */
-#b{
+#buttons{
     position:absolute;
     z-index: 5;
     bottom:10px;
@@ -120,12 +120,12 @@ html{
     padding:10px;
     font-size:40px;
 }
-.ingame #b,
+.ingame #buttons,
 .rumble{
     left:0;
 }
 
-#b a{
+#buttons a{
     display:inline-block;
     width:1.5em;
     line-height:1.5em;
@@ -133,6 +133,14 @@ html{
     color:white;
     border-radius:2px;
     cursor:pointer;
+}
+#buttons a:hover{
+    -webkit-transform: scale(1.1);
+    transform: scale(1.1);
+}
+
+#buttons a img{
+    width:1em;
 }
 
 /* points */
@@ -267,7 +275,7 @@ body.menu #menu{
 
 #menu > div:hover,
 .pill.active:hover,
-#b a:hover{
+#buttons a:hover{
     background: #55bbff;
     transform:scale(1.1);
 }
@@ -302,13 +310,13 @@ body.menu #menu{
     max-width:128px;
     background: #55bbff;
     border-left: 1px solid white;
-    transform:translateX(110%);
+    display:none;
     overflow-y:auto;
     /* Overlap points display we don't want */
     z-index: 5;
 }
 #tl.active{
-    transform:translateX(0);
+    display:block;
 }
 #tl img{
     width:90%;
@@ -340,7 +348,7 @@ body.menu #menu{
 
     #menu > div:hover,
     .pill.active:hover,
-    #b a:hover{
+    #buttons a:hover{
         background: #55bbff;
         transform:scale(1.01);
     }
@@ -371,7 +379,7 @@ body.menu #menu{
     }
 }
 @media(max-width:800px){
-    #b{
+    #buttons{
         font-size:20px;
     }
 }

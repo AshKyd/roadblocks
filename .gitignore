@@ -8,3 +8,8 @@ chrome.zip
 /firefox
 /chrome
 .levels.json
+src/phonegap/www/res/screen
+src/phonegap/www/res/icon
+src/chrome/icons
+src/firefox/icons
+src/phonegap/www/dist

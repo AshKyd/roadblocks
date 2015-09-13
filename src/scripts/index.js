@@ -1,6 +1,9 @@
-var Game = require('./game');
 window.d = document;
 window.w = window;
+var fs = require('fs');
+d.body.innerHTML = fs.readFileSync(__dirname+'/../templates/bootstrap.tpl', 'utf8');
+require('../style/style.css');
+var Game = require('./game');
 var canvas = d.querySelector('canvas');
 canvas.width = innerWidth;
 canvas.height = innerHeight;
@@ -12,6 +15,20 @@ var playSound = require('./sfx');
 var modal = require('./modal');
 var Storage = require('./storage');
 var tileList = d.querySelector('#tl');
+
+// Feature detect Chrome using chrome.storage.sync.
+var chromeApp = false;
+try{
+    chromeApp = !!chrome.storage.sync;
+} catch(e){
+
+}
+
+window.onresize = function(){
+    d.body.width = window.innerWidth;
+    d.body.height = window.innerHeight;
+};
+window.onresize();
 
 // Previous active tile.
 var thisActive;
@@ -201,12 +218,15 @@ function showMenu(){
     // hide the tile list dialog from free mode
     tileList.className = '';
     logo(canvas,ctx,0,1);
-    d.querySelector('#menu').innerHTML = [
+    var menuOptions = [
         ['Puzzle','roadx-base'],
-        ['Free map','dump'],
-        // ['Report a bug','grass'],
-        ['Exit','grass'], // Only useful for app modes.
-    ].map(function(text){
+        ['Free map','dump']
+    ];
+
+    if(chromeApp){
+        menuOptions.push(['Exit','grass']); // Only useful for app modes.
+    }
+    d.querySelector('#menu').innerHTML = menuOptions.map(function(text){
         var dac = ' data-action="'+text[0]+'"';
         return '<div'+dac+'><img'+dac+' src="'+drawTile(text[1], Math.min(canvas.width, canvas.height)/4)+'">'+text[0]+'</div>';
     }).join('');

@@ -34,7 +34,7 @@
     "stats.js": "~1.0.0"
   },
   "scripts": {
-    "clean": "rm dist chrome chrome.zip dist.zip -rf;mkdir -p dist;",
+    "clean": "rm dist chrome firefox facebook chrome.zip firefox.zip dist.zip -rf;mkdir -p dist;",
     "encode-levels": "node src/scripts/levels.js > src/scripts/.levels.json",
     "browserify": "browserify src/scripts/index.js | uglifyjs --screw-ie8 -mc > dist/index.js",
     "copy": "cp src/index.html src/images dist/ -r;",
@@ -46,7 +46,9 @@
     "watch": "npm run server & node node_modules/watch/cli.js 'npm run build' src/scripts --ignoreDotFiles",
     "build-chrome": "npm run clean;npm run build & cp src/chrome/ chrome/ -R;wait;cp dist/* chrome/ -R;cd chrome;zip ../chrome.zip -X -r *",
     "build-firefox": "npm run clean;npm run build & cp src/firefox/ firefox/ -R;wait;cp dist/* firefox/ -R;cd firefox;zip ../firefox.zip -X -r *",
-    "build-phonegap": "mkdir -p src/phonegap/www/dist/;cp dist/* src/phonegap/www/dist/ -r"
+    "build-phonegap": "mkdir -p src/phonegap/www/dist/;cp dist/* src/phonegap/www/dist/ -r",
+    "build-facebook": "npm run clean;mkdir facebook;npm run build;cp dist/* facebook/ -r; cp src/facebook/* facebook/",
+    "deploy-facebook": "npm run clean; npm run build-facebook;rsync -avz facebook/* direct.ash.ms:/var/www/spacekidgames.com/public_html/facebook/roadblocks/"
   },
   "browserify": {
     "transform": [

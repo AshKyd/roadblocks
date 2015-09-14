@@ -4,9 +4,9 @@
 <div class="chrome">
     <div id="p"></div>
     <div id="buttons">
-        <a data-action="menu"><img src="images/icon-menu.svg"></a>
-        <a data-action="ss"><img src="images/icon-screenshot.svg"></a>
-        <a data-action="restart"><img src="images/icon-restart.svg"></a>
+        <a><img data-action="menu" src="images/icon-menu.svg"></a>
+        <a><img data-action="ss" src="images/icon-screenshot.svg"></a>
+        <a><img data-action="restart" src="images/icon-restart.svg"></a>
     </div>
 </div>
 <div id="menu"></div>

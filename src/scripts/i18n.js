@@ -12,6 +12,7 @@ translations.forEach(function(row){
     translationMap[row[0]] = row;
 });
 
+var preferredLang = 'en';
 navigator.languages.some(function(lang){
     lang = lang.split('-')[0];
     if(langs[lang]){

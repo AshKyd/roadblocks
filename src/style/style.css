@@ -117,20 +117,18 @@ html{
     background: #55bbff;
     border:1px solid white;
     border-left-style: none;
-    padding:10px;
+    padding:.2cm .5cm;
     font-size:.9cm;
-    margin-right: .2cm;
 }
 .ingame #buttons,
 .rumble{
     left:0;
 }
 
-#buttons a{
+#buttons a img{
     display:inline-block;
     width:1cm;
-    line-height:1cm;
-    text-align: center;
+    height:1cm;
     color:white;
     border-radius:2px;
     cursor:pointer;
@@ -142,6 +140,10 @@ html{
 
 #buttons a img{
     width:1cm;
+}
+
+#buttons a + a{
+    margin-left:.5cm;
 }
 
 /* points */

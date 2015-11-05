@@ -1,15 +1,33 @@
 {
-  "name": "Road Blocks",
-  "version": "1.0.2",
-  "description": "Connect the map in this road building puzzle game.",
-  "launch_path": "/index.html",
-  "icons": {
-      "128": "/icons/128.png",
-      "512": "/icons/512.png"
-  },
-  "developer": {
-    "name": "Space Kid Games",
-    "url": "http://spacekidgames.com/road-blocks/"
-  },
-  "default_locale": "en"
+    "name": "Road Blocks",
+    "version": "1.0.2",
+    "description": "Connect the map in this road building puzzle game.",
+    "launch_path": "/index.html",
+    "icons": {
+        "128": "/icons/128.png",
+        "512": "/icons/512.png"
+    },
+    "developer": {
+        "name": "Space Kid Games",
+        "url": "http://spacekidgames.com/road-blocks/"
+    },
+    "default_locale": "en",
+    "locales": {
+        "en": {
+            "name": "Road Blocks",
+            "description": "Connect the map in this road building puzzle game."
+        },
+        "es": {
+            "name": "Road Blocks",
+            "description": "Conecte el mapa en este juego de rompecabezas de la construcción de carreteras."
+        },
+        "fr": {
+            "name": "Road Blocks",
+            "description": "Branchez la carte dans ce jeu de puzzle de la construction de routes."
+        },
+        "pt": {
+            "name": "Road Blocks",
+            "description": "Conecte o mapa neste quebra-cabeça jogo de construção de estrada."
+        }
+    }
 }

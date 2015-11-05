@@ -10,6 +10,7 @@ var random = require('./random');
 var touchList = require('./touchlist');
 var jsonStringify = JSON.stringify;
 var modal = require('./modal');
+var i18n = require('./i18n');
 var levelEncode = require('./levels/encodelevel');
 
 var colorInterface = '#55bbff';
@@ -536,7 +537,13 @@ function Game(opts){
         newCanvas.height = referenceCanvas.height/1.5;
         var newContext = newCanvas.getContext('2d');
         newContext.drawImage(referenceCanvas, 0, 0-referenceCanvas.height/3);
-        modal.show(message, title, tile ? newCanvas.toDataURL() : 0, 1, cb);
+        modal.show(
+            i18n(message),
+            i18n(title),
+            tile ? newCanvas.toDataURL() : 0,
+            1,
+            cb
+        );
     }
 
     _this.setTile = function(tile, cb){

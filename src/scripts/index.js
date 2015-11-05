@@ -8,7 +8,7 @@ var canvas = d.querySelector('canvas');
 canvas.width = innerWidth;
 canvas.height = innerHeight;
 var ctx = canvas.getContext('2d');
-var levels = require('./l');
+var levels = require('./levels');
 var SpriteLib = require('./sprites');
 var logo = require('./logo');
 var playSound = require('./sfx');
@@ -110,6 +110,24 @@ var actions = {
             });
             thisGame = 0;
         }
+    },
+    save: function(){
+        modal.show(
+            fs.readFileSync(__dirname+'/../templates/savedialog.tpl','utf8'),
+            'Save map',
+            null,
+            0,
+            function(){
+                var saveFile = thisGame.saveState({
+                    name: document.querySelector('#save-name').value,
+                    intro: document.querySelector('#save-intro').value,
+                });
+                var games = Storage.state.customgames || [];
+                games.push(saveFile);
+                Storage.set('customgames', JSON.stringify(games));
+            },
+            'Save'
+        );
     },
     Puzzle: function(){
         modal.show(

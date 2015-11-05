@@ -7,6 +7,7 @@
         <a><img data-action="menu" src="images/icon-menu.svg"></a>
         <a><img data-action="ss" src="images/icon-screenshot.svg"></a>
         <a><img data-action="restart" src="images/icon-restart.svg"></a>
+        <!-- <a><img data-action="save" src="images/icon-save.svg"></a> -->
     </div>
 </div>
 <div id="menu"></div>

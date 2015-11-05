@@ -10,6 +10,7 @@ var random = require('./random');
 var touchList = require('./touchlist');
 var jsonStringify = JSON.stringify;
 var modal = require('./modal');
+var levelEncode = require('./levels/encodelevel');
 
 var colorInterface = '#55bbff';
 var ingameclass = 'ingame';
@@ -585,6 +586,25 @@ function Game(opts){
                 cb();
             }
         }
+    };
+
+    _this.saveState = function(stateOpts){
+        var level = {
+            name: stateOpts.name,
+            intro: stateOpts.intro,
+            outro: stateOpts.outro,
+            w: opts.w,
+            h: opts.w,
+            wMod: opts.wMod,
+            base: opts.base,
+            predef: []
+        };
+        crawlMap(map, opts.w, opts.h, function(x, y, tile){
+            if(tile !== opts.base){
+                level.predef.push([x,y,tile]);
+            }
+        });
+        return levelEncode(level);
     };
 
     /**

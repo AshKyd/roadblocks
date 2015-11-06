@@ -138,7 +138,7 @@ var actions = {
                 (unlocked ? 'active' : '') +
                 '" data-action="'+(unlocked ? 'l' : '')+'" data-l="'+i+'">'+(i+1)+'. '+i18n(level.name)+'</a>';
             }).join(''),
-            'Puzzle play',
+            i18n('Puzzle Play'),
             null,
             0,
             0,

@@ -1,11 +1,20 @@
 var translations = require('../i18n');
 
-var langs = {
-    en: 0,
-    es: 1,
-    fr: 2,
-    pt: 3
-};
+var langs = {};
+
+[
+    "en",
+    "es",
+    "fr",
+    "pt",
+    "ru",
+    "da",
+    "af",
+    "id",
+    "jp",
+].forEach(function(lang, i){
+    langs[lang] = i;
+});
 
 var translationMap = {};
 translations.forEach(function(row){
@@ -20,6 +29,8 @@ navigator.languages.some(function(lang){
         return true;
     }
 });
+
+preferredLang = 'af';
 
 module.exports = function(str){
     if(translationMap[str]){

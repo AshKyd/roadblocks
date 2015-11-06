@@ -30,8 +30,6 @@ navigator.languages.some(function(lang){
     }
 });
 
-preferredLang = 'af';
-
 module.exports = function(str){
     if(translationMap[str]){
         return translationMap[str][langs[preferredLang]];

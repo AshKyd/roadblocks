@@ -4,6 +4,7 @@
          "scripts": [ "background.js" ]
       }
    },
+   "default_locale": "en",
    "description": "Connect the map in this road building puzzle game.",
    "icons": {
       "16": "icons/16.png",
@@ -17,5 +18,7 @@
    "permissions": [
         "fullscreen",
         "storage"
-    ]
+    ],
+    "homepage_url": "http://spacekidgames.com/road-blocks/",
+    "offline_enabled": true
 }

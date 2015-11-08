@@ -1,0 +1,10 @@
+{
+  "appName": {
+    "message": "Road Blocks",
+    "description": "The title of the application, displayed in the web store."
+  },
+  "appDesc": {
+    "message": "Connect the map in this road building puzzle game.", 
+    "description":"The description of the application, displayed in the web store."
+  }
+}

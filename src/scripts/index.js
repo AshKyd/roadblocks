@@ -15,6 +15,7 @@ var playSound = require('./sfx');
 var modal = require('./modal');
 var Storage = require('./storage');
 var tileList = d.querySelector('#tl');
+var i18n = require('./i18n');
 
 // Feature detect Chrome using chrome.storage.sync.
 var chromeApp = false;
@@ -135,18 +136,21 @@ var actions = {
                 var unlocked = (!i || Storage.state['Puzzle'+i]);
                 return '<a class="pill '+
                 (unlocked ? 'active' : '') +
-                '" data-action="'+(unlocked ? 'l' : '')+'" data-l="'+i+'">'+(i+1)+'. '+level.name+'</a>';
+                '" data-action="'+(unlocked ? 'l' : '')+'" data-l="'+i+'">'+(i+1)+'. '+i18n.t(level.name)+'</a>';
             }).join(''),
-            'Puzzle play',
+            i18n.t('Puzzle Play'),
             null,
             0,
             0,
-            'Back'
+            i18n.t('Back')
         );
     },
     'Free map': function(){
         if(!Storage.state.Puzzle5){
-            modal.show('Unlock this mode by completing more puzzles.', 'Mode locked');
+            modal.show(
+                i18n.t('Unlock this mode by completing more puzzles.'),
+                i18n.t('Mode locked')
+            );
         } else {
             tileList.innerHTML = SpriteLib.placeable.map(function(sprite){
                 return '<img id="t'+sprite+'" src="'+drawTile(sprite, 128)+'" data-action="p" data-s="'+sprite+'">';
@@ -197,8 +201,8 @@ function loadGame(gameType, levelId){
     if(!level){
         if(thisGame){
             modal.show(
-                "Congratulations, you've finished all the levels. Be sure to share this game with your friends!",
-                'You won!',
+                i18n.t('Congratulations, you\'ve finished all the levels. Be sure to share this game with your friends!'),
+                i18n.t('You won!'),
                 0,
                 0,
                 showMenu
@@ -223,9 +227,15 @@ function loadGame(gameType, levelId){
 
     level.onlose = function(){
         thisGame.destroy(function(){
-            modal.show('Looks like you got stuck. Tap to try again.', 'Level failed', null, 1, function(){
-                loadGame(gameType, levelId);
-            });
+            modal.show(
+                i18n.t('Looks like you got stuck. Tap to try again.'),
+                i18n.t('Level failed'),
+                null,
+                1,
+                function(){
+                    loadGame(gameType, levelId);
+                }
+            );
         });
     };
 
@@ -237,29 +247,41 @@ function showMenu(){
     tileList.className = '';
     logo(canvas,ctx,0,1);
     var menuOptions = [
-        ['Puzzle','roadx-base'],
-        ['Free map','dump']
+        ['Puzzle','roadx-base', i18n.t('Puzzle')],
+        ['Free map','dump', i18n.t('Free map')],
     ];
 
     if(chromeApp){
-        menuOptions.push(['Exit','grass']); // Only useful for app modes.
+        menuOptions.push(['Exit','grass', i18n.t('Exit')]); // Only useful for app modes.
     }
     d.querySelector('#menu').innerHTML = menuOptions.map(function(text){
         var dac = ' data-action="'+text[0]+'"';
-        return '<div'+dac+'><img'+dac+' src="'+drawTile(text[1], Math.min(canvas.width, canvas.height)/4)+'">'+text[0]+'</div>';
+        return '<div'+dac+'><img'+dac+' src="'+drawTile(text[1], Math.min(canvas.width, canvas.height)/4)+'">'+text[2]+'</div>';
     }).join('');
     d.body.className = 'menu';
     playSound('dialog');
 }
 
-if(window.AudioContext || window.webkitAudioContext){
-    showMenu();
+function begin(){
+    if(window.AudioContext || window.webkitAudioContext){
+        showMenu();
+    } else {
+        modal.show(
+            i18n.t('This browser is too old to run Road Blocks.')+
+            '<a class="pill active" href="http://spacekidgames.com/road-blocks/system-requirements">'+i18n.t('Find out more')+'</a>',
+            i18n.t('Unsupported'),
+            null,
+            1
+        );
+    }
+}
+
+// This is sad. Chrome killed languages and turned it into an async API.
+if(chromeApp){
+    chrome.i18n.getAcceptLanguages(function(languages){
+        i18n.setup(languages);
+        begin();
+    });
 } else {
-    modal.show(
-        'This browser is too old to run Road Blocks.'+
-        '<a class="pill active" href="http://spacekidgames.com/road-blocks/system-requirements">Find out more</a>',
-        'Unsupported',
-        null,
-        1
-    );
+    begin();
 }

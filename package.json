@@ -1,6 +1,6 @@
 {
   "name": "thirteenk-2k15",
-  "version": "1.0.2",
+  "version": "1.2.0",
   "description": "I don't know yet",
   "main": "src/scripts/index.js",
   "repository": {
@@ -31,7 +31,9 @@
   },
   "dependencies": {
     "gulp-minify-css": "~0.3.7",
-    "stats.js": "~1.0.0"
+    "stats.js": "~1.0.0",
+    "i18n": "~0.5.0",
+    "i18next": "~2.0.0-alpha.17"
   },
   "scripts": {
     "clean": "rm dist chrome firefox facebook chrome.zip firefox.zip dist.zip -rf;mkdir -p dist;",

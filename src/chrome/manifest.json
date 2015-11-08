@@ -14,11 +14,10 @@
    },
    "manifest_version": 2,
    "name": "Road Blocks",
-   "version": "1.0.2",
+   "version": "1.1.0",
    "permissions": [
         "fullscreen",
         "storage"
     ],
-    "homepage_url": "http://spacekidgames.com/road-blocks/",
     "offline_enabled": true
 }

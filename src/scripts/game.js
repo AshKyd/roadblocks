@@ -538,8 +538,8 @@ function Game(opts){
         var newContext = newCanvas.getContext('2d');
         newContext.drawImage(referenceCanvas, 0, 0-referenceCanvas.height/3);
         modal.show(
-            i18n(message),
-            i18n(title),
+            i18n.t(message),
+            i18n.t(title),
             tile ? newCanvas.toDataURL() : 0,
             1,
             cb

@@ -136,20 +136,20 @@ var actions = {
                 var unlocked = (!i || Storage.state['Puzzle'+i]);
                 return '<a class="pill '+
                 (unlocked ? 'active' : '') +
-                '" data-action="'+(unlocked ? 'l' : '')+'" data-l="'+i+'">'+(i+1)+'. '+i18n(level.name)+'</a>';
+                '" data-action="'+(unlocked ? 'l' : '')+'" data-l="'+i+'">'+(i+1)+'. '+i18n.t(level.name)+'</a>';
             }).join(''),
-            i18n('Puzzle Play'),
+            i18n.t('Puzzle Play'),
             null,
             0,
             0,
-            i18n('Back')
+            i18n.t('Back')
         );
     },
     'Free map': function(){
         if(!Storage.state.Puzzle5){
             modal.show(
-                i18n('Unlock this mode by completing more puzzles.'),
-                i18n('Mode locked')
+                i18n.t('Unlock this mode by completing more puzzles.'),
+                i18n.t('Mode locked')
             );
         } else {
             tileList.innerHTML = SpriteLib.placeable.map(function(sprite){
@@ -201,8 +201,8 @@ function loadGame(gameType, levelId){
     if(!level){
         if(thisGame){
             modal.show(
-                i18n('Congratulations, you\'ve finished all the levels. Be sure to share this game with your friends!'),
-                i18n('You won!'),
+                i18n.t('Congratulations, you\'ve finished all the levels. Be sure to share this game with your friends!'),
+                i18n.t('You won!'),
                 0,
                 0,
                 showMenu
@@ -228,8 +228,8 @@ function loadGame(gameType, levelId){
     level.onlose = function(){
         thisGame.destroy(function(){
             modal.show(
-                i18n('Looks like you got stuck. Tap to try again.'),
-                i18n('Level failed'),
+                i18n.t('Looks like you got stuck. Tap to try again.'),
+                i18n.t('Level failed'),
                 null,
                 1,
                 function(){
@@ -247,12 +247,12 @@ function showMenu(){
     tileList.className = '';
     logo(canvas,ctx,0,1);
     var menuOptions = [
-        ['Puzzle','roadx-base', i18n('Puzzle')],
-        ['Free map','dump', i18n('Free map')],
+        ['Puzzle','roadx-base', i18n.t('Puzzle')],
+        ['Free map','dump', i18n.t('Free map')],
     ];
 
     if(chromeApp){
-        menuOptions.push(['Exit','grass']); // Only useful for app modes.
+        menuOptions.push(['Exit','grass', i18n.t('Exit')]); // Only useful for app modes.
     }
     d.querySelector('#menu').innerHTML = menuOptions.map(function(text){
         var dac = ' data-action="'+text[0]+'"';
@@ -262,14 +262,26 @@ function showMenu(){
     playSound('dialog');
 }
 
-if(window.AudioContext || window.webkitAudioContext){
-    showMenu();
+function begin(){
+    if(window.AudioContext || window.webkitAudioContext){
+        showMenu();
+    } else {
+        modal.show(
+            i18n.t('This browser is too old to run Road Blocks.')+
+            '<a class="pill active" href="http://spacekidgames.com/road-blocks/system-requirements">'+i18n.t('Find out more')+'</a>',
+            i18n.t('Unsupported'),
+            null,
+            1
+        );
+    }
+}
+
+// This is sad. Chrome killed languages and turned it into an async API.
+if(chromeApp){
+    chrome.i18n.getAcceptLanguages(function(languages){
+        i18n.setup(languages);
+        begin();
+    });
 } else {
-    modal.show(
-        i18n('This browser is too old to run Road Blocks.')+
-        '<a class="pill active" href="http://spacekidgames.com/road-blocks/system-requirements">'+i18n('Find out more')+'</a>',
-        i18n('Unsupported'),
-        null,
-        1
-    );
+    begin();
 }

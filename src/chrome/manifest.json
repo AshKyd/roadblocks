@@ -14,7 +14,7 @@
    },
    "manifest_version": 2,
    "name": "Road Blocks",
-   "version": "1.1.0",
+   "version": "1.2.0",
    "permissions": [
         "fullscreen",
         "storage"

@@ -15,14 +15,14 @@ var i18n = module.exports = {
 
         [
             "en",
-            "es",
-            "fr",
-            "pt",
-            "ru",
-            "da",
-            "af",
-            "id",
-            "jp",
+            // "es",
+            // "fr",
+            // "pt",
+            // "ru",
+            // "da",
+            // "af",
+            // "id",
+            // "jp",
         ].forEach(function(lang, i){
             langs[lang] = i;
         });

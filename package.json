@@ -13,14 +13,6 @@
     "url": "https://github.com/AshKyd/polar-defense/issues"
   },
   "devDependencies": {
-    "gulp": "~3.6.2",
-    "gulp-uglify": "~0.2.1",
-    "gulp-connect": "~2.0.5",
-    "gulp-browserify": "~0.5.0",
-    "gulp-less": "~1.2.3",
-    "rsyncwrapper": "~0.4.1",
-    "gulp-zip": "~1.0.0",
-    "through": "~2.3.4",
     "browserify": "~11.0.1",
     "uglifyjs": "~2.4.10",
     "minifyify": "~7.0.5",
@@ -38,11 +30,11 @@
   "scripts": {
     "clean": "rm dist chrome firefox facebook chrome.zip firefox.zip dist.zip -rf;mkdir -p dist;",
     "encode-levels": "node src/scripts/levels/levels.js > src/scripts/levels/levels.json",
-    "browserify": "browserify src/scripts/index.js | uglifyjs --screw-ie8 -mc > dist/index.js",
+    "browserify": "node node_modules/browserify/bin/cmd.js src/scripts/index.js | node node_modules/uglifyjs/bin/uglifyjs --screw-ie8 -mc > dist/index.js",
     "copy": "cp src/index.html src/images dist/ -r;",
     "css": "cat src/style/style.css|node_modules/clean-css/bin/cleancss > dist/style.css",
     "zip": "rm dist.zip;zip -X -r dist.zip dist/* && ls -l dist.zip",
-    "build": "npm run copy & npm run css; wait; npm run browserify; npm run build-phonegap;",
+    "build": "npm run copy & npm run css; wait; npm run browserify;",
     "deploy": "npm run clean; npm run build;rsync -avz dist/* direct.ash.ms:/var/www/ash.ms/public_html/js13k2k15/",
     "server": "mkdir -p dist; cd dist; beefy ../src/scripts/index.js:index.js",
     "watch": "npm run server & node node_modules/watch/cli.js 'npm run build' src/scripts --ignoreDotFiles",

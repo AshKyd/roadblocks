@@ -12,3 +12,5 @@ src/phonegap/www/res/screen
 src/phonegap/www/res/icon
 src/firefox/icons
 src/phonegap/www/dist
+.DS_Store
+.cache

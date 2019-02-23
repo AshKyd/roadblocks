@@ -1,48 +1,29 @@
 {
-  "name": "thirteenk-2k15",
+  "name": "roadblocks",
   "version": "1.3.0",
   "description": "I don't know yet",
   "main": "src/scripts/index.js",
   "repository": {
     "type": "git",
-    "url": "git@github.com:AshKyd/polar-defense.git"
+    "url": "git@github.com:AshKyd/roadblocks.git"
   },
   "author": "Ash Kyd <ash@kyd.com.au>",
   "license": "BSD",
   "bugs": {
-    "url": "https://github.com/AshKyd/polar-defense/issues"
+    "url": "https://github.com/AshKyd/roadblocks/issues"
   },
   "devDependencies": {
-    "browserify": "~11.0.1",
-    "uglifyjs": "~2.4.10",
-    "minifyify": "~7.0.5",
-    "http-server": "~0.8.0",
-    "clean-css": "~3.4.1",
-    "brfs": "~1.4.1",
-    "cssify": "~0.7.0"
-  },
-  "dependencies": {
-    "gulp-minify-css": "~0.3.7",
     "stats.js": "~1.0.0",
     "i18n": "~0.5.0",
-    "i18next": "~2.0.0-alpha.17"
+    "i18next": "~2.0.0-alpha.17",
+    "parcel": "^1.11.0"
   },
   "scripts": {
-    "clean": "rm dist chrome firefox facebook chrome.zip firefox.zip dist.zip -rf;mkdir -p dist;",
+    "start": "parcel src/index.html",
+    "build": "npm run clean;parcel build src/index.html -d dist/game/;cp web/* dist/",
+    "clean": "rm -rf dist chrome chrome.zip;mkdir -p dist;",
     "encode-levels": "node src/scripts/levels/levels.js > src/scripts/levels/levels.json",
-    "browserify": "node node_modules/browserify/bin/cmd.js src/scripts/index.js | node node_modules/uglifyjs/bin/uglifyjs --screw-ie8 -mc > dist/index.js",
-    "copy": "cp src/index.html src/images dist/ -r;",
-    "css": "cat src/style/style.css|node_modules/clean-css/bin/cleancss > dist/style.css",
-    "zip": "rm dist.zip;zip -X -r dist.zip dist/* && ls -l dist.zip",
-    "build": "npm run clean;npm run copy & npm run css; wait; npm run browserify;",
-    "deploy": "npm run clean; npm run build;rsync -avz dist/* direct.ash.ms:/var/www/ash.ms/public_html/js13k2k15/",
-    "server": "mkdir -p dist; cd dist; beefy ../src/scripts/index.js:index.js",
-    "watch": "npm run server & node node_modules/watch/cli.js 'npm run build' src/scripts --ignoreDotFiles",
-    "build-chrome": "npm run clean;npm run build & cp src/chrome/ chrome/ -R;wait;cp dist/* chrome/ -R;cd chrome;zip ../chrome.zip -X -r *",
-    "build-firefox": "npm run clean;npm run build & cp src/firefox/ firefox/ -R;wait;cp dist/* firefox/ -R;cd firefox;zip ../firefox.zip -X -r *",
-    "build-phonegap": "mkdir -p src/phonegap/www/dist/;cp dist/* src/phonegap/www/dist/ -r",
-    "build-facebook": "npm run clean;mkdir facebook;npm run build;cp dist/* facebook/ -r; cp src/facebook/* facebook/",
-    "deploy-facebook": "npm run clean; npm run build-facebook;rsync -avz facebook/* direct.ash.ms:/var/www/spacekidgames.com/public_html/facebook/roadblocks/"
+    "build-chrome": "npm run clean;npm run build & cp src/chrome/ chrome/ -R;wait;cp dist/* chrome/ -R;cd chrome;zip ../chrome.zip -X -r *"
   },
   "browserify": {
     "transform": [

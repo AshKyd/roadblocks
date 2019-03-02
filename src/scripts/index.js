@@ -1,10 +1,6 @@
 window.d = document;
 window.w = window;
-var fs = require("fs");
-d.body.innerHTML = fs.readFileSync(
-  __dirname + "/../templates/bootstrap.tpl",
-  "utf8"
-);
+d.body.innerHTML = require("../templates/bootstrap.js");
 require("../style/style.css");
 var Game = require("./game");
 var canvas = d.querySelector("canvas");
@@ -113,7 +109,7 @@ var actions = {
   },
   save: function() {
     modal.show(
-      fs.readFileSync(__dirname + "/../templates/savedialog.tpl", "utf8"),
+      require("../templates/savedialog.js"),
       "Save map",
       null,
       0,

@@ -20,7 +20,7 @@
   },
   "scripts": {
     "start": "parcel src/index.html",
-    "build": "npm run clean;parcel build src/index.html -d dist/game/;cp web/* dist/",
+    "build": "npm run clean;parcel build src/index.html -d dist/game/ --public-url /game/;cp web/* dist/",
     "clean": "rm -rf dist chrome chrome.zip;mkdir -p dist;",
     "encode-levels": "node src/scripts/levels/levels.js > src/scripts/levels/levels.json",
     "build-chrome": "npm run clean;npm run build & cp src/chrome/ chrome/ -R;wait;cp dist/* chrome/ -R;cd chrome;zip ../chrome.zip -X -r *"

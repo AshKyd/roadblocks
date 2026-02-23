@@ -22,6 +22,10 @@
     --darkFg: #fff;
 }
 
+* {
+    box-sizing: border-box;
+}
+
 body,
 html {
     margin: 0;
@@ -36,9 +40,9 @@ html {
 .module-app {
     background: linear-gradient(
         135deg,
-        var(--pink-barbie) 0%,
+        var(--pink-barbie) 10%,
         var(--orange-sunset) 50%,
-        var(--cyan-beach) 100%
+        var(--cyan-beach) 90%
     );
     background-attachment: fixed;
     min-height: 100vh;
@@ -95,16 +99,23 @@ html {
 section {
     position: relative;
     border-radius: 16px;
-    margin: 60px auto; /* Centered with vertical spacing */
-    max-width: 1000px; /* Align with content width */
-    padding: 60px; /* Increased padding */
+    margin: 40px 20px; /* Default gutters for mobile */
+    max-width: 1000px;
+    padding: 30px 20px; /* Tighter padding for mobile */
     background: var(--glass-bg);
     backdrop-filter: blur(36px);
     box-shadow:
         inset 0 2px 4px var(--reflective-highlight),
         0 8px 32px var(--chunk-shadow);
     transition: transform 0.3s ease;
-    border: none; /* Remove section borders */
+    border: none;
+}
+
+@media (min-width: 1080px) {
+    section {
+        margin: 60px auto; /* Centered on desktop */
+        padding: 40px; /* Consistent padding: 40px all around */
+    }
 }
 
 .module-app__section-primary,
@@ -114,12 +125,22 @@ section {
     backdrop-filter: none;
     box-shadow: none;
     border: none;
-    max-width: 1000px; /* Still centered but transparent */
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .video-section {
-    margin: 0 auto; /* Tighten spacing */
-    padding: 20px 60px;
+    margin: 40px 20px; /* Match gutters for mobile */
+    padding: 0;
+    overflow: hidden;
+}
+
+@media (min-width: 1080px) {
+    .video-section {
+        margin: 60px auto; /* Centered on desktop */
+        padding: 0;
+    }
 }
 
 .cta-section {

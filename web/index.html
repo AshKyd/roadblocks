@@ -97,7 +97,12 @@
                     <h2 class="sr-only">Gameplay Screenshot</h2>
                     <a href="/game/">
                         <img
-                            src="./screenshot.webp"
+                            src="./screenshot-1080.webp"
+                            srcset="
+                                ./screenshot-744.webp   744w,
+                                ./screenshot-1920.webp 1920w
+                            "
+                            sizes="(max-width: 1000px) calc(100vw - 40px), 1000px"
                             alt="A screenshot of gameplay with cute isometric houses by the seaside, in the distance a forest with blocky pixel moose grazing."
                             width="1920"
                             height="1080"

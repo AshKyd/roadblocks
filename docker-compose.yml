@@ -3,7 +3,6 @@ services:
         container_name: roadblocks.kyd.au
         build: .
         volumes:
-            - ./data:/data
             - ./logs:/logs
         restart: always
         labels:

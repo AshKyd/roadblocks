@@ -1,11 +1,8 @@
-FROM node:20-alpine AS build
+FROM node:25-alpine AS build
 WORKDIR /app
 
 COPY package*.json ./
-# Make sure we don't copy local node_modules due to permission errors
-# We'll install everything fresh.
 RUN npm install
-RUN npm install vite@latest vite-plugin-commonjs @originjs/vite-plugin-commonjs --save-dev
 
 COPY . .
 

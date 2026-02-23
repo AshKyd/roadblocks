@@ -40,9 +40,9 @@ html {
 .module-app {
     background: linear-gradient(
         135deg,
-        var(--pink-barbie) 10%,
+        var(--pink-barbie) 0%,
         var(--orange-sunset) 50%,
-        var(--cyan-beach) 90%
+        var(--cyan-beach) 100%
     );
     background-attachment: fixed;
     min-height: 100vh;
@@ -120,7 +120,8 @@ section {
 
 .module-app__section-primary,
 .cta-section,
-.video-section {
+.video-section,
+.image-section {
     background: transparent;
     backdrop-filter: none;
     box-shadow: none;
@@ -130,15 +131,25 @@ section {
     margin-right: auto;
 }
 
-.video-section {
-    margin: 40px 20px; /* Match gutters for mobile */
+.video-section,
+.image-section {
+    margin: 40px auto;
     padding: 0;
     overflow: hidden;
 }
 
+.image-section img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 16px; /* Match the section radius if needed, or rely on overflow: hidden */
+    box-shadow: 0 15px 45px var(--chunk-shadow);
+}
+
 @media (min-width: 1080px) {
-    .video-section {
-        margin: 60px auto; /* Centered on desktop */
+    .video-section,
+    .image-section {
+        margin: 60px auto;
         padding: 0;
     }
 }

@@ -30,7 +30,10 @@ body,
 html {
     margin: 0;
     padding: 0;
-    font-family: "Outfit", sans-serif;
+    font-family:
+        "Avenir Next", Avenir, "Century Gothic", "Franklin Gothic", system-ui,
+        sans-serif;
+    font-size: 1.2rem; /* Enhanced readability */
     background: var(--darkBg);
     color: var(--darkFg);
     line-height: 1.6;
@@ -91,7 +94,8 @@ html {
 }
 
 .module-app__header img {
-    height: 32px;
+    height: 48px;
+    width: 48px;
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
@@ -127,13 +131,24 @@ section {
     box-shadow: none;
     border: none;
     max-width: 1000px;
-    margin-left: auto;
-    margin-right: auto;
+    /* Use standard margins for mobile gutters */
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+@media (min-width: 1080px) {
+    .module-app__section-primary,
+    .cta-section,
+    .video-section,
+    .image-section {
+        margin-left: auto;
+        margin-right: auto;
+    }
 }
 
 .video-section,
 .image-section {
-    margin: 40px auto;
+    margin: 40px 20px; /* Standard gutters for mobile */
     padding: 0;
     overflow: hidden;
 }
@@ -179,12 +194,6 @@ section {
     margin-bottom: 20px;
     color: var(--yellow-sun);
     text-shadow: 3px 3px 0 var(--pink-hot);
-}
-
-.module-app__section-primary p {
-    font-size: 1.2rem;
-    max-width: 600px;
-    color: white;
 }
 
 /* Testimonials / Glossy Blocks */
@@ -358,9 +367,17 @@ footer a:hover {
     color: var(--cyan-beach);
 }
 
+h1,
 h2 {
-    font-size: 2rem;
-    margin-bottom: 20px;
+    margin: 0;
+    line-height: 1.2;
+    font-weight: 800; /* High contrast extrabold */
+    letter-spacing: 0.02em; /* Geometric airiness */
+}
+
+h2 {
+    font-size: 2.5rem;
+    margin-bottom: 24px;
 }
 
 .sr-only {

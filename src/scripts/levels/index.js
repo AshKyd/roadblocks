@@ -3,9 +3,10 @@
  * 12054 bytes without.
  * 12031 bytes with minification
  */
-var spriteIndex = Object.keys(require('../sprites').sprites);
-// var levels = require('./levels.js');
-var levels = require('./levels.json');
+import spritesLib from '../sprites.js';
+var spriteIndex = Object.keys(spritesLib.sprites);
+// import levels from './levels.js';
+import levels from './levels.json';
 
 
 function numberise(a){
@@ -58,4 +59,4 @@ Object.keys(levels).map(function(levelType){
     });
 });
 
-module.exports = levels;
+export default levels;

@@ -1,5 +1,5 @@
 // Nicked from http://stackoverflow.com/questions/5560248
-module.exports = function(color, percent) {
+export default function(color, percent) {
     color = color.substr(1);
     var num = parseInt(color, 16),
         amt = Math.round(2.55 * percent),

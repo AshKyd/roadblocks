@@ -3,7 +3,7 @@
 // 2.75 - after index
 // 2.45 after combining predef array
 //
-var SpriteLib = require('../sprites');
+import SpriteLib from '../sprites';
 var spriteIndex = Object.keys(SpriteLib.sprites);
 
 /**
@@ -73,7 +73,7 @@ function dec(input){
 var before = 0;
 var after = 0;
 
-module.exports = function(level){
+export default function(level){
     // Flatten
     level.predef = level.predef.map(function(predef){
         var index = spriteIndex.indexOf(predef[2]);

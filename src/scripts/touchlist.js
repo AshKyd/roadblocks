@@ -1,4 +1,4 @@
-module.exports = function(e){
+export default function(e){
     var originalTouch = e.touches || [e];
     var returnObj = {
         clientX: originalTouch[0].clientX,

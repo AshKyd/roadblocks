@@ -2,7 +2,7 @@
 if(typeof window === 'undefined'){
     global.innerWidth = 0;
 }
-var SpriteLib = require('../sprites');
+import SpriteLib from '../sprites';
 
 function addRow(a, x, max, type){
     for(var i=0;i<max;i++){
@@ -402,7 +402,8 @@ var before = 0;
 var after = 0;
 
 Object.keys(levels).forEach(function(key){
-    levels[key] = levels[key].map(require('./encodelevel'));
+    import encodelevel from './encodelevel.js';
+    levels[key] = levels[key].map(encodelevel);
 });
 console.log(JSON.stringify(levels));
-module.exports = levels;
+export default levels;

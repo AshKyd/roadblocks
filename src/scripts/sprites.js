@@ -22,7 +22,7 @@
 
 var exaggeration = innerWidth < 800 ? 2 : 1;
 
-var random = require('./random');
+import random from './random';
 var roadColor = '#444444';
 var elkColor = '#AE907A';
 var grey1 = '#aaaaaa';
@@ -418,7 +418,7 @@ var animated = {
     dump: 1,
 };
 
-module.exports = {
+export default {
     sprites: sprites,
     placeable: placeable,
     tileLogic: tileLogic,

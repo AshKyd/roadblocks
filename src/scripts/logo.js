@@ -5,12 +5,12 @@ var logo = [
     [1, ,1, ,1, , ,1, ,1, ,1, ,1, ,1, ,1, ,1, ,1, , ,1, , ,1, ,1, , , ,1, ,1, , , ,1],
     [1, ,1, , ,1,1, , ,1, ,1, ,1,1, , ,1,1,1, ,1,1,1, ,1,1, , , ,1,1, ,1, ,1, ,1,1,1]
 ];
-var drawCube = require('./drawCube');
-var getIsometricPos = require('./getisometricpos');
-var shadeColor = require('./shadecolor');
-var playSound = require('./sfx');
+import drawCube from './drawCube';
+import getIsometricPos from './getisometricpos';
+import shadeColor from './shadecolor';
+import playSound from './sfx';
 
-module.exports = function(canvas, ctx, cb, force){
+export default function(canvas, ctx, cb, force){
     var x = canvas.width/6.5;
     var y = canvas.height/8;
     var w = canvas.width/50;

@@ -1,12 +1,16 @@
-module.exports = `<canvas></canvas>
+import iconMenu from "../images/icon-menu.svg";
+import iconScreenshot from "../images/icon-screenshot.svg";
+import iconRestart from "../images/icon-restart.svg";
+
+export default `<canvas></canvas>
 <div id="tt"></div>
 <div id="s" style="display:none;"></div>
 <div class="chrome">
     <div id="p"></div>
     <div id="buttons">
-        <a><img data-action="menu" src="${require("../images/icon-menu.svg")}"></a>
-        <a><img data-action="ss" src="${require("../images/icon-screenshot.svg")}"></a>
-        <a><img data-action="restart" src="${require("../images/icon-restart.svg")}"></a>
+        <a data-action="menu"><img src="${iconMenu}" data-action="menu"></a>
+        <a data-action="ss"><img src="${iconScreenshot}" data-action="ss"></a>
+        <a data-action="restart"><img src="${iconRestart}" data-action="restart"></a>
     </div>
 </div>
 <div id="menu"></div>

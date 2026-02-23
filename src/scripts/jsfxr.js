@@ -482,4 +482,4 @@ var jsfxr = function(settings) {
   return output;
 }
 
-module.exports = jsfxr;
+export default jsfxr;

@@ -1,6 +1,6 @@
 var cCache = {};
 
-var shadeColor = require('./shadecolor');
+import shadeColor from './shadecolor';
 
 function drawPoly(ctx, a, b, c, d, e, f, g, h, fill, stroke){
     ctx.beginPath();
@@ -16,7 +16,7 @@ function drawPoly(ctx, a, b, c, d, e, f, g, h, fill, stroke){
 }
 
 // Draw a cube to the specified specs
-module.exports = function(ctx, x, y, wx, wy, h, color, alpha) {
+export default function(ctx, x, y, wx, wy, h, color, alpha) {
     ctx.globalAlpha = alpha || 1;
     ctx.lineWidth = 1;
     drawPoly(

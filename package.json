@@ -1,34 +1,37 @@
 {
-  "name": "roadblocks",
-  "version": "1.3.0",
-  "description": "I don't know yet",
-  "main": "src/scripts/index.js",
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:AshKyd/roadblocks.git"
-  },
-  "author": "Ash Kyd <ash@kyd.com.au>",
-  "license": "BSD",
-  "bugs": {
-    "url": "https://github.com/AshKyd/roadblocks/issues"
-  },
-  "devDependencies": {
-    "stats.js": "~1.0.0",
-    "i18n": "~0.5.0",
-    "i18next": "~2.0.0-alpha.17",
-    "parcel": "^1.11.0"
-  },
-  "scripts": {
-    "start": "parcel src/index.html",
-    "build": "npm run clean;parcel build src/index.html -d dist/game/ --public-url /game/;cp web/* dist/",
-    "clean": "rm -rf dist chrome chrome.zip;mkdir -p dist;",
-    "encode-levels": "node src/scripts/levels/levels.js > src/scripts/levels/levels.json",
-    "build-chrome": "npm run clean;npm run build & cp src/chrome/ chrome/ -R;wait;cp dist/* chrome/ -R;cd chrome;zip ../chrome.zip -X -r *"
-  },
-  "browserify": {
-    "transform": [
-      "cssify",
-      "brfs"
-    ]
-  }
+    "name": "roadblocks",
+    "version": "1.3.0",
+    "description": "I don't know yet",
+    "main": "src/scripts/index.js",
+    "type": "module",
+    "repository": {
+        "type": "git",
+        "url": "git@github.com:AshKyd/roadblocks.git"
+    },
+    "author": "Ash Kyd <ash@kyd.com.au>",
+    "license": "BSD",
+    "bugs": {
+        "url": "https://github.com/AshKyd/roadblocks/issues"
+    },
+    "devDependencies": {
+        "i18n": "~0.5.0",
+        "i18next": "~2.0.0-alpha.17",
+        "stats.js": "~1.0.0"
+    },
+    "scripts": {
+        "start": "vite",
+        "build": "vite build && cp -R web/* dist/",
+        "clean": "rm -rf dist chrome chrome.zip;mkdir -p dist;",
+        "encode-levels": "node src/scripts/levels/levels.js > src/scripts/levels/levels.json",
+        "build-chrome": "npm run clean;npm run build & cp src/chrome/ chrome/ -R;wait;cp dist/* chrome/ -R;cd chrome;zip ../chrome.zip -X -r *"
+    },
+    "browserify": {
+        "transform": [
+            "cssify",
+            "brfs"
+        ]
+    },
+    "dependencies": {
+        "vite": "^7.3.1"
+    }
 }

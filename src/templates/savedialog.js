@@ -1,4 +1,4 @@
-module.exports = `<div>
+export default `<div>
     <label for="name">Name your creation</label>
     <input type="text" id="save-name" value="Untitled">
 </div>

@@ -1,166 +1,139 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <title>Road Blocks game</title>
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="https://lazy-product-landing-page.kyd.au/module-app.css"
-    />
-    <meta
-      name="description"
-      content="Connect the grid and build infrastructure with Road Blocks, a challenging puzzle game"
-    />
-    <meta property="og:type" content="product" />
-    <meta
-      property="og:image"
-      content="https://roadblocks.ash.ms/og-image.png"
-    />
-    <meta
-      property="og:description"
-      content="Connect the grid and build infrastructure with Road Blocks, a challenging puzzle game"
-    />
-    <meta property="og:title" content="Road Blocks: the game" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@ashkyd" />
-    <meta name="twitter:title" content="Road Blocks: the game" />
-    <meta
-      name="twitter:description"
-      content="Connect the grid and build infrastructure with Road Blocks, a challenging puzzle game"
-    />
-    <meta name="twitter:creator" content="@ashkyd" />
-    <meta
-      name="twitter:image:src"
-      content="https://roadblocks.ash.ms/og-image.png"
-    />
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script
-      async
-      src="https://www.googletagmanager.com/gtag/js?id=UA-2547771-2"
-    ></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-      gtag("js", new Date());
+    <head>
+        <meta charset="utf-8" />
+        <title>Road Blocks game</title>
+        <link rel="stylesheet" type="text/css" href="style.css" />
+        <meta
+            name="description"
+            content="Connect the grid and build infrastructure with Road Blocks, a challenging puzzle game"
+        />
+        <meta property="og:type" content="product" />
+        <meta
+            property="og:image"
+            content="https://roadblocks.ashk.au/og-image.png"
+        />
+        <meta
+            property="og:description"
+            content="Connect the grid and build infrastructure with Road Blocks, a challenging puzzle game"
+        />
+        <meta property="og:title" content="Road Blocks: the game" />
+    </head>
+    <body>
+        <div class="module-app">
+            <header class="module-app__header">
+                <div class="inner">
+                    <h1><img src="/favicon.ico" alt="" /> Road Blocks</h1>
+                </div>
+            </header>
 
-      gtag("config", "UA-2547771-2");
-    </script>
-    <style type="text/css">
-      :root {
-        --darkBg: #151517;
-        --darkFg: #fff;
-        --lightBg: #fff;
-        --lightFg: #000;
-        --gradient1: #0096df;
-        --gradient2: #3cd8ff;
-        --gradientFg: #fff;
-        --gradientFg2: #fff;
-        --buttonPrimaryBg: #fff;
-        --buttonPrimaryBgActive: #ffe714;
-        --buttonPrimaryFg: #000;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="module-app module-system-font">
-      <header class="module-app__header">
-        <div class="inner">
-          <h1><img src="/favicon.ico" alt="" /> Road Blocks</h1>
+            <section class="module-app__section-primary padding-tall">
+                <div class="inner">
+                    <h2>Connect the map in this road building puzzle game.</h2>
+                    <p>
+                        Ten levels of increasing difficulty, two map styles, and
+                        a whole bunch of road blocks. Complete the puzzles and
+                        unlock free play mode to build the little town of your
+                        dreams.
+                    </p>
+
+                    <div class="btn-group">
+                        <a href="/game/" class="btn btn-primary"
+                            >Launch the game</a
+                        >
+                    </div>
+                </div>
+            </section>
+
+            <section class="padding-tall video-section">
+                <div class="inner-wide">
+                    <h2 class="sr-only">Watch the video</h2>
+                    <div class="module-video">
+                        <video
+                            src="demo.mp4"
+                            autoplay
+                            muted
+                            loop
+                            playsinline
+                        ></video>
+                    </div>
+                </div>
+            </section>
+
+            <section class="padding">
+                <div class="inner">
+                    <h2>Word on the street</h2>
+                    <div class="module-app__testimonials">
+                        <h2 class="sr-only">Testimonials</h2>
+                        <figure>
+                            <blockquote>“my school blocked it”</blockquote>
+                            <figcaption>— A Google User</figcaption>
+                        </figure>
+                        <figure>
+                            <blockquote>“I really love this!”</blockquote>
+                            <figcaption>— Emerson S</figcaption>
+                        </figure>
+                        <figure>
+                            <blockquote>
+                                “the best feature is the exit button”
+                            </blockquote>
+                            <figcaption>— An unkind Google user</figcaption>
+                        </figure>
+                    </div>
+                </div>
+            </section>
+
+            <section class="padding-tall cta-section">
+                <div class="inner">
+                    <h2>Try Road Blocks today</h2>
+                    <div class="btn-group">
+                        <a href="/game/" class="btn btn-primary"
+                            >Launch the game</a
+                        >
+                    </div>
+                </div>
+            </section>
+
+            <section class="padding-tall making-of-section">
+                <div class="inner">
+                    <h2>Read the making of</h2>
+                    <blockquote>
+                        “Because I wanted this to be a first-class touch game, I
+                        implemented everything mobile first. This was a
+                        fantastic way to discover all the limitations of the
+                        platform at the get-go rather than having to refit a
+                        desktop game to mobile later on.”
+                    </blockquote>
+                    <p>
+                        <br />
+                        <a href="https://ashk.au/2015/09/15/l-road-blocks/">
+                            Road Blocks & js13k &raquo;
+                        </a>
+                    </p>
+                </div>
+            </section>
+
+            <footer>
+                <div class="inner footer-inner">
+                    <p>
+                        An enterprise of <a href="https://ashk.au/">Ash Kyd</a>.
+                    </p>
+                    <p>
+                        Find the
+                        <a href="https://github.com/AshKyd/roadblocks"
+                            >source on github</a
+                        >.
+                    </p>
+                </div>
+                <a href="https://github.com/ashkyd/roadblocks" class="fork-me"
+                    ><img
+                        class="attachment-full size-full"
+                        alt="Fork me on GitHub"
+                        src="https://github.blog/wp-content/uploads/2008/12/forkme_right_darkblue_121621.png?resize=149%2C149"
+                        width="149"
+                        height="149"
+                /></a>
+            </footer>
         </div>
-      </header>
-      <section
-        class="module-app__section-primary padding padding-tall"
-        style="background:black;background-image:url('background.jpg');background-size:cover;"
-      >
-        <div class="inner">
-          <h2>Connect the map in this road building puzzle game.</h2>
-          <p>
-            Ten levels of increasing difficulty, two map styles, and a whole
-            bunch of road blocks. Complete the puzzles and unlock free play mode
-            to build the little town of your dreams.
-          </p>
-
-          <div class="btn-group">
-            <a href="/game/" class="btn btn-primary">Launch the game</a>
-          </div>
-        </div>
-      </section>
-
-      <section class="module-app__section-dark padding padding-tall">
-        <div class="inner-wide">
-          <h2 class="sr-only">Watch the video</h2>
-          <div class="module-video">
-            <iframe
-              src="https://www.youtube.com/embed/mA90VA7ieFU"
-              allowfullscreen=""
-              frameborder="0"
-            ></iframe>
-          </div>
-        </div>
-      </section>
-
-      <section class="module-app__section-dark padding">
-        <h2>Word on the street</h2>
-        <div class="module-app__testimonials inner">
-          <h2 class="sr-only">Testimonials</h2>
-          <figure>
-            <blockquote>“my school blocked it”</blockquote>
-            <figcaption>— A Google User</figcaption>
-          </figure>
-          <figure>
-            <blockquote>“I really love this!”</blockquote>
-            <figcaption>— Emerson S</figcaption>
-          </figure>
-          <figure>
-            <blockquote>“the best feature is the exit button”</blockquote>
-            <figcaption>— An unkind Google user</figcaption>
-          </figure>
-        </div>
-      </section>
-
-      <section class="module-app__section-primary padding padding-tall">
-        <div class="inner">
-          <h2>Try Road Blocks today</h2>
-          <div class="btn-group">
-            <a href="/game/" class="btn btn-primary">Launch the game</a>
-          </div>
-        </div>
-      </section>
-
-      <section class="module-app__section-light padding padding-tall">
-        <div class="inner">
-          <h2>Read the making of</h2>
-          <blockquote>
-            “Because I wanted this to be a first-class touch game, I implemented
-            everything mobile first. This was a fantastic way to discover all
-            the limitations of the platform at the get-go rather than having to
-            refit a desktop game to mobile later on.”
-          </blockquote>
-          <p>
-            <br />
-            <a href="https://ash.ms/2015-09-15/road-blocks/">
-              Road Blocks & js13k &raquo;
-            </a>
-          </p>
-        </div>
-      </section>
-
-      <footer class="module-app__section-dark padding">
-        <p>
-          An enterprise of <a href="https://ash.ms/">Ash Kyd</a>. <br />
-          Find the
-          <a href="https://github.com/AshKyd/roadblocks">source on github</a>.
-          Also available as a
-          <a
-            href="https://chrome.google.com/webstore/detail/road-blocks/ldcpoimjjikjcphnnlphcajepbfbdmeo"
-            >Chrome app</a
-          >.
-          <a href="https://github.com/ashkyd/roadblocks" style="position:absolute;right:0;top:0;background:transparent;"><img class="attachment-full size-full" alt="Fork me on GitHub" data-recalc-dims="1" src="https://github.blog/wp-content/uploads/2008/12/forkme_right_darkblue_121621.png?resize=149%2C149" width="149" height="149"></a>
-        </p>
-      </footer>
-    </div>
-  </body>
+    </body>
 </html>

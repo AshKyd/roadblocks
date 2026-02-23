@@ -1,0 +1,376 @@
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap");
+
+:root {
+    /* Florida Barbie Minecraft Palette */
+    --pink-barbie: #ff69b4;
+    --pink-hot: #ff1493;
+    --cyan-beach: #00f2ff;
+    --cyan-deep: #00cbd6;
+    --yellow-sun: #ffeb3b;
+    --lavender: #e6e6fa;
+    --orange-sunset: #ff8c00;
+    --plastic-white: rgba(255, 255, 255, 0.9);
+    --glass-bg: rgba(255, 255, 255, 0.15);
+    --glass-border: rgba(255, 255, 255, 0.4);
+
+    /* Minecraft Structural Colors */
+    --chunk-shadow: rgba(0, 0, 0, 0.2);
+    --reflective-highlight: rgba(255, 255, 255, 0.8);
+
+    /* Original Mappings */
+    --darkBg: #191f27;
+    --darkFg: #fff;
+}
+
+body,
+html {
+    margin: 0;
+    padding: 0;
+    font-family: "Outfit", sans-serif;
+    background: var(--darkBg);
+    color: var(--darkFg);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+.module-app {
+    background: linear-gradient(
+        135deg,
+        var(--pink-barbie) 0%,
+        var(--orange-sunset) 50%,
+        var(--cyan-beach) 100%
+    );
+    background-attachment: fixed;
+    min-height: 100vh;
+}
+
+.inner,
+.inner-wide {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 20px;
+    position: relative;
+    z-index: 2;
+}
+
+.inner-wide {
+    max-width: 1200px;
+}
+
+.padding {
+    padding: 60px 0;
+}
+.padding-tall {
+    padding: 100px 0;
+}
+
+/* Header */
+.module-app__header {
+    background: var(--glass-bg);
+    backdrop-filter: blur(36px);
+    border-bottom: 2px solid var(--glass-border);
+    padding: 20px 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 15px var(--chunk-shadow);
+}
+
+.module-app__header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    color: white;
+    text-shadow: 2px 2px 4px var(--chunk-shadow);
+}
+
+.module-app__header img {
+    height: 32px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+/* Sections & Reflective Plastic Minecraft Vibes */
+section {
+    position: relative;
+    border-radius: 16px;
+    margin: 60px auto; /* Centered with vertical spacing */
+    max-width: 1000px; /* Align with content width */
+    padding: 60px; /* Increased padding */
+    background: var(--glass-bg);
+    backdrop-filter: blur(36px);
+    box-shadow:
+        inset 0 2px 4px var(--reflective-highlight),
+        0 8px 32px var(--chunk-shadow);
+    transition: transform 0.3s ease;
+    border: none; /* Remove section borders */
+}
+
+.module-app__section-primary,
+.cta-section,
+.video-section {
+    background: transparent;
+    backdrop-filter: none;
+    box-shadow: none;
+    border: none;
+    max-width: 1000px; /* Still centered but transparent */
+}
+
+.video-section {
+    margin: 0 auto; /* Tighten spacing */
+    padding: 20px 60px;
+}
+
+.cta-section {
+    text-align: center;
+}
+
+.making-of-section {
+    background: var(--plastic-white);
+    backdrop-filter: none;
+    color: var(--darkBg);
+    box-shadow:
+        inset 0 2px 4px rgba(255, 255, 255, 0.5),
+        0 10px 30px var(--chunk-shadow);
+}
+
+.making-of-section a {
+    color: var(--pink-hot);
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+.module-app__section-primary h2 {
+    font-size: 3rem;
+    line-height: 1.1;
+    margin-bottom: 20px;
+    color: var(--yellow-sun);
+    text-shadow: 3px 3px 0 var(--pink-hot);
+}
+
+.module-app__section-primary p {
+    font-size: 1.2rem;
+    max-width: 600px;
+    color: white;
+}
+
+/* Testimonials / Glossy Blocks */
+.module-app__testimonials {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.module-app__testimonials figure {
+    padding: 25px;
+    border-radius: 20px;
+    color: var(--darkBg);
+    margin: 0;
+    border: none; /* Remove border */
+    box-shadow:
+        inset -4px -4px 0 rgba(0, 0, 0, 0.1),
+        inset 4px 4px 0 rgba(255, 255, 255, 0.3),
+        0 10px 20px var(--chunk-shadow);
+    transform: perspective(1000px) rotateX(5deg);
+    transition: transform 0.3s ease;
+}
+
+.module-app__testimonials figure:nth-child(1) {
+    background: var(--pink-barbie);
+}
+.module-app__testimonials figure:nth-child(2) {
+    background: var(--cyan-beach);
+}
+.module-app__testimonials figure:nth-child(3) {
+    background: #b2f2bb; /* Pastel Green */
+}
+
+.module-app__testimonials figure:hover {
+    transform: perspective(1000px) rotateX(0deg) scale(1.05);
+}
+
+.module-app__testimonials blockquote {
+    margin: 0 0 15px 0;
+    font-style: italic;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.module-app__testimonials figcaption {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: rgba(0, 0, 0, 0.6);
+}
+
+/* Video Block */
+.module-video {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+    border-radius: 20px;
+    overflow: hidden;
+    border: none; /* Remove double border */
+    box-shadow: 0 15px 45px var(--chunk-shadow);
+}
+
+.module-video video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Fix cropping */
+}
+
+/* Fork Me Banner */
+.fork-me {
+    position: fixed; /* Keep it in place */
+    right: 0;
+    top: 0; /* Align to the very top right */
+    background: transparent;
+    z-index: 1001; /* Above sticky header */
+}
+
+.fork-me img {
+    width: 120px; /* Slightly smaller for fixed pos */
+    height: auto;
+}
+
+/* Buttons / Plastic Glossy Buttons */
+.btn {
+    display: inline-block;
+    padding: 15px 40px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: none;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary {
+    background: var(--yellow-sun);
+    color: #000;
+    box-shadow:
+        0 8px 0 #d4c328,
+        0 15px 20px var(--chunk-shadow);
+}
+
+.btn-primary::after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        rgba(255, 255, 255, 0),
+        rgba(255, 255, 255, 0.4),
+        rgba(255, 255, 255, 0)
+    );
+    transform: rotate(45deg);
+    transition: 0.3s;
+}
+
+.btn-primary:hover {
+    transform: translateY(-4px);
+    box-shadow:
+        0 12px 0 #d4c328,
+        0 20px 30px var(--chunk-shadow);
+}
+
+.btn-primary:hover::after {
+    left: 100%;
+}
+
+.btn-primary:active {
+    transform: translateY(4px);
+    box-shadow:
+        0 0 0 #d4c328,
+        0 5px 10px var(--chunk-shadow);
+}
+
+/* Footer & Other */
+footer {
+    padding: 30px 20px;
+    background: var(--darkBg); /* Solid background */
+    margin-top: 40px;
+    border-top: 2px solid var(--glass-border);
+    position: relative;
+}
+
+.footer-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+footer p {
+    margin: 0;
+}
+
+footer a {
+    color: var(--yellow-sun);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+footer a:hover {
+    color: var(--cyan-beach);
+}
+
+h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+@media (max-width: 768px) {
+    .module-app__section-primary h2 {
+        font-size: 2.2rem;
+    }
+    .padding-tall {
+        padding: 60px 0;
+    }
+}
+
+/* Floating animation for Minecraft blocks */
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+.module-app__testimonials figure {
+    animation: float 6s ease-in-out infinite;
+}
+
+.module-app__testimonials figure:nth-child(2) {
+    animation-delay: 1s;
+}
+.module-app__testimonials figure:nth-child(3) {
+    animation-delay: 2s;
+}
